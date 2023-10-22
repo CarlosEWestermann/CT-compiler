@@ -1,0 +1,2 @@
+int     valor_1 = 10;
+float valor_2 = 5.3;

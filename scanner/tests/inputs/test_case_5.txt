@@ -1,0 +1,3 @@
+if(valor_1 == 10 || valor_2 != 5) {
+    return false;
+}
