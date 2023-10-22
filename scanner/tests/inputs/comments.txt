@@ -1,0 +1,4 @@
+// Isto é um comentário de uma linha
+int a = 5; /* Isto é um
+comentário de várias
+linhas */
