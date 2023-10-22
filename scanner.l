@@ -3,10 +3,13 @@
 %}
 
 %option noyywrap
+%option yylineno
 
 %%
 
 " " {}
+
+\n {}
 
 int return TK_PR_INT;
 
