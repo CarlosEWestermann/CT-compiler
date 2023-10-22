@@ -37,8 +37,8 @@ void print_nome2(int token) {
   printf("%d TK_ESPECIAL [%c]\n", get_line_number(), token);
 }
 /* A função retorna RET_SUCESSO se o token é conhecido. Caso contrário:
-   - retorna RET_TKNERRO se o token é de erro
-   - retorna RET_DESCONH se o token é desconhecido */
+- retorna RET_TKNERRO se o token é de erro
+- retorna RET_DESCONH se o token é desconhecido */
 int print_token(int token) {
   switch (token){
     case '-':
