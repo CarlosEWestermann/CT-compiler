@@ -28,20 +28,20 @@ return return TK_PR_RETURN;
 "&" return TK_OC_AND;
 "|" return TK_OC_OR;
 "-" return '-';
-"!" return '!'
-"*" return '*'
-"/" return '/'
-"%" return '%'
-"+" return '+'
-"<" return '<'
-">" return '>'
-"{" return '{'
-"}" return '}'
-"(" return '('
-")" return ')'
-"=" return '='
-"," return ','
-";" return ';'
+"!" return '!';
+"*" return '*';
+"/" return '/';
+"%" return '%';
+"+" return '+';
+"<" return '<';
+">" return '>';
+"{" return '{';
+"}" return '}';
+"(" return '(';
+")" return ')';
+"=" return '=';
+"," return ',';
+";" return ';';
 
 [0-9]+ return TK_LIT_INT;  
 [0-9]*"."[0-9]+ | [0-9]+"." return TK_LIT_FLOAT;
