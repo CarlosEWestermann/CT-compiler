@@ -1,6 +1,3 @@
-#!/bin/bash
-
-# Move para o diretório pai e compila o scanner usando o Makefile
 cd ..
 make
 cd -
