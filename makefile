@@ -1,7 +1,7 @@
 CC = gcc
 
 OBJECTS = main.o functions.o
-EXECUTABLE = main
+EXECUTABLE = scanner
 
 all: $(EXECUTABLE)
 

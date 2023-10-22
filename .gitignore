@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+#generated flex files
+lex.yy.c
+
+#executables
+scanner
