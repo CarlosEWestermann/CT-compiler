@@ -1,7 +1,9 @@
 CC = gcc
+BISON = bison
+FLEX = flex
 
-OBJECTS = main.o functions.o
-EXECUTABLE = scanner
+OBJECTS = main.o functions.o parser.tab.o lex.yy.o
+EXECUTABLE = etapa2
 
 all: $(EXECUTABLE)
 
@@ -11,11 +13,17 @@ functions.o: functions.c
 main.o: main.c
 	$(CC) $< -c
 
-lex.yy.c: scanner.l
-	flex $<
+parser_errors.o: parser_errors.c
+	$(CC) $< -c
 
-$(EXECUTABLE): $(OBJECTS) lex.yy.c
-	$(CC) $(OBJECTS) lex.yy.c -o $@
+parser.tab.c parser.tab.h: parser.y
+	$(BISON) -d $<
+
+lex.yy.c: parser.tab.h
+	$(FLEX) $<
+
+$(EXECUTABLE): $(OBJECTS)
+	$(CC) $(OBJECTS) -o $@
 
 .PHONY: run clean
 
@@ -23,4 +31,4 @@ run: $(EXECUTABLE)
 	./$(EXECUTABLE)
 
 clean:
-	rm -f $(EXECUTABLE) $(OBJECTS) lex.yy.c
+	rm -f $(EXECUTABLE) $(OBJECTS) lex.yy.c parser.tab.c parser.tab.h
