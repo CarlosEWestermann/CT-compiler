@@ -10,17 +10,20 @@ all: $(EXECUTABLE)
 functions.o: functions.c
 	$(CC) $< -c 
 
-main.o: main.c
-	$(CC) $< -c
-
-parser_errors.o: parser_errors.c
+main.o: main.c parser.tab.h
 	$(CC) $< -c
 
 parser.tab.c parser.tab.h: parser.y
-	$(BISON) -d $<
+	$(BISON) -d $< 
 
-lex.yy.c: parser.tab.h
+parser.tab.o: parser.tab.c
+	$(CC) $< -c
+
+lex.yy.c: scanner.l
 	$(FLEX) $<
+
+lex.yy.o: lex.yy.c
+	$(CC) $< -c
 
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(OBJECTS) -o $@

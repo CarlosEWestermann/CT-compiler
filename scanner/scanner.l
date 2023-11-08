@@ -43,12 +43,12 @@ return return TK_PR_RETURN;
 "," return ',';
 ";" return ';';
 
-[0-9]+ return TK_LIT_INT;  
-[-+]?([0-9]*\.[0-9]+|[0-9]+\.)?([eE][-+]?[0-9]+)? return TK_LIT_FLOAT;
+[0-9]+ return TK_LIT_INT;
+[-+]?([0-9]*\.[0-9]+|[0-9]+\.)?([0-9]+)? return TK_LIT_FLOAT;
 "false" return TK_LIT_FALSE;
 "true" return TK_LIT_TRUE;
 
-[a-zA-Z_][a-zA-Z0-9_]* return TK_IDENTIFICADOR;
+[a-z_][a-zA-Z0-9_]* return TK_IDENTIFICADOR;
 
 . return TK_ERRO;
 
