@@ -47,8 +47,10 @@ list_vars: TK_IDENTIFICADOR;
 
 function: header body;
 
-header: '('param_list')' TK_OC_GE type '!' TK_IDENTIFICADOR;
+header: '('param_list')' TK_OC_GE type '!' functin_name;
 header: '('')' TK_OC_GE type '!' TK_IDENTIFICADOR;
+
+function_name: TK_IDENTIFICADOR;
 
 param_list: param_list',' param;
 param_list: param;
@@ -62,6 +64,64 @@ command_list: command_list command;
 command_list: command;
 
 command: command_list;
-command: TK_LIT_FALSE;
+command: local_var_dec';';
+command: attrib';';
+command: conditional';';
+command: while';';
+command: return';';
+command: function_call';';
+
+local_var_dec: type list_vars;
+
+attrib: TK_IDENTIFICADOR '=' expr;
+
+function_call: function_name '('arg_list')';
+function_call: function_name '('')';
+
+arg_list: arg_list',' arg;
+arg_list: arg;
+
+arg: expr;
+arg: TK_IDENTIFICADOR;
+
+return: TK_PR_RETURN expr;
+
+conditional: TK_PR_IF '('expr')' '{'command_list'}';
+conditional: TK_PR_IF '('expr')' '{'command_list'}' TK_PR_ELSE '{'command_list'}'
+
+while: TK_PR_WHILE '('expr')' '{'command_list'}';
+
+expr: operator;
+expr: boolean;
+expr: operand operator;
+
+boolean: TK_LIT_FALSE;
+boolean: TK_LIT_TRUE;
+numeric: TK_LIT_FLOAT;
+numeric: TK_LIT_INT; 
+operand: function_call;
+
+operator: unop;
+operator: binop;
+
+unop: '-'numeric expr;
+//pode? perguntar
+unop: '-'TK_IDENTIFICADOR expr;
+
+unop: '!';
+binop: '*';
+binop: '/';
+binop: '%';
+binop: '+';
+binop: '-';
+binop: '<';
+binop: '>';
+binop: TK_OC_LE;
+binop: TK_OC_GE;
+binop: TK_OC_EQ;
+binop: TK_OC_NE;
+binop: TK_OC_AND;
+binop: TK_OC_OR;
+
 
 %%
