@@ -1,127 +1,138 @@
 %{
-int yylex(void);
-void yyerror (char const *mensagem);
+    int yylex(void);
+    void yyerror (char const *mensagem);
 %}
 
 %define parse.error verbose
 
-%token TK_PR_INT
-%token TK_PR_FLOAT
-%token TK_PR_BOOL
-%token TK_PR_IF
-%token TK_PR_ELSE
-%token TK_PR_WHILE
-%token TK_PR_RETURN
-%token TK_OC_LE
-%token TK_OC_GE
-%token TK_OC_EQ
-%token TK_OC_NE
-%token TK_OC_AND
-%token TK_OC_OR
-%token TK_IDENTIFICADOR
-%token TK_LIT_INT
-%token TK_LIT_FLOAT
-%token TK_LIT_FALSE
-%token TK_LIT_TRUE
-%token TK_ERRO
+%token UMINUS
+
+%token TK_PR_INT TK_PR_FLOAT TK_PR_BOOL TK_PR_IF TK_PR_ELSE TK_PR_WHILE TK_PR_RETURN
+%token TK_OC_LE TK_OC_GE TK_OC_EQ TK_OC_NE TK_OC_AND TK_OC_OR
+%token TK_IDENTIFICADOR TK_LIT_INT TK_LIT_FLOAT TK_LIT_FALSE TK_LIT_TRUE TK_ERRO
 
 %%
 
-program: list;
-program: /* programa vazio */;
+program: /* empty */
+       | program element;
 
-list: list element;
-list: element;
+element: function
+       | global_declaration;
 
-element: function;
-element: global_declaration;
+global_declaration: type list_vars ';';
 
-global_declaration: type list_vars';' ;
+type: TK_PR_INT
+    | TK_PR_FLOAT
+    | TK_PR_BOOL;
 
-type: TK_PR_INT;
-type: TK_PR_FLOAT;
-type: TK_PR_BOOL;
-
-list_vars: list_vars',' TK_IDENTIFICADOR;
-list_vars: TK_IDENTIFICADOR;
+list_vars: TK_IDENTIFICADOR
+         | list_vars ',' TK_IDENTIFICADOR;
 
 function: header body;
 
-header: '('param_list')' TK_OC_GE type '!' functin_name;
-header: '('')' TK_OC_GE type '!' TK_IDENTIFICADOR;
+header: '(' param_list ')' TK_OC_GE type '!' function_name
+       | '(' ')' TK_OC_GE type '!' TK_IDENTIFICADOR;
 
 function_name: TK_IDENTIFICADOR;
 
-param_list: param_list',' param;
-param_list: param;
+param_list: param
+           | param_list ',' param;
 
 param: type TK_IDENTIFICADOR;
 
 body: '{' '}'
-body: '{' command_list '}'
+    | '{' command_list '}';
 
-command_list: command_list command;
-command_list: command;
+command_list: command
+            | command_list command;
 
-command: command_list;
-command: local_var_dec';';
-command: attrib';';
-command: conditional';';
-command: while';';
-command: return';';
-command: function_call';';
+command: local_var_dec ';'
+       | attrib ';'
+       | conditional ';'
+       | while ';'
+       | return ';'
+       | function_call ';';
 
 local_var_dec: type list_vars;
 
 attrib: TK_IDENTIFICADOR '=' expr;
 
-function_call: function_name '('arg_list')';
-function_call: function_name '('')';
+function_call
+    : TK_IDENTIFICADOR '(' arg_list ')'
+    | TK_IDENTIFICADOR '(' ')'
+    ;
 
-arg_list: arg_list',' arg;
-arg_list: arg;
+arg_list
+    : arg
+    | arg_list ',' arg
+    ;
 
-arg: expr;
-arg: TK_IDENTIFICADOR;
+arg
+    : expr
+    ;
 
 return: TK_PR_RETURN expr;
 
-conditional: TK_PR_IF '('expr')' '{'command_list'}';
-conditional: TK_PR_IF '('expr')' '{'command_list'}' TK_PR_ELSE '{'command_list'}'
+conditional: TK_PR_IF '(' expr ')' '{' command_list '}'
+            | TK_PR_IF '(' expr ')' '{' command_list '}' TK_PR_ELSE '{' command_list '}';
 
-while: TK_PR_WHILE '('expr')' '{'command_list'}';
+while: TK_PR_WHILE '(' expr ')' '{' command_list '}';
 
-expr: operator;
-expr: boolean;
-expr: operand operator;
+expr: logical_or_expr;
 
-boolean: TK_LIT_FALSE;
-boolean: TK_LIT_TRUE;
-numeric: TK_LIT_FLOAT;
-numeric: TK_LIT_INT; 
-operand: function_call;
+logical_or_expr
+    : logical_and_expr
+    | logical_or_expr TK_OC_OR logical_and_expr
+    ;
 
-operator: unop;
-operator: binop;
+logical_and_expr
+    : equality_expr
+    | logical_and_expr TK_OC_AND equality_expr
+    ;
 
-unop: '-'numeric expr;
-//pode? perguntar
-unop: '-'TK_IDENTIFICADOR expr;
+equality_expr
+    : relational_expr
+    | equality_expr TK_OC_EQ relational_expr
+    | equality_expr TK_OC_NE relational_expr
+    ;
 
-unop: '!';
-binop: '*';
-binop: '/';
-binop: '%';
-binop: '+';
-binop: '-';
-binop: '<';
-binop: '>';
-binop: TK_OC_LE;
-binop: TK_OC_GE;
-binop: TK_OC_EQ;
-binop: TK_OC_NE;
-binop: TK_OC_AND;
-binop: TK_OC_OR;
+relational_expr
+    : add_sub_expr
+    | relational_expr '<' add_sub_expr
+    | relational_expr '>' add_sub_expr
+    | relational_expr TK_OC_LE add_sub_expr
+    | relational_expr TK_OC_GE add_sub_expr
+    ;
+
+add_sub_expr
+    : mult_div_mod_expr
+    | add_sub_expr '+' mult_div_mod_expr
+    | add_sub_expr '-' mult_div_mod_expr
+    ;
+
+mult_div_mod_expr
+    : unary_expr
+    | mult_div_mod_expr '*' unary_expr
+    | mult_div_mod_expr '/' unary_expr
+    | mult_div_mod_expr '%' unary_expr
+    ;
+
+unary_expr
+    : primary_expr
+    | '-' primary_expr %prec UMINUS
+    | '!' primary_expr
+    ;
+
+primary_expr
+    : TK_IDENTIFICADOR
+    | TK_LIT_INT
+    | TK_LIT_FLOAT
+    | TK_LIT_TRUE
+    | TK_LIT_FALSE
+    | function_call
+    | '(' expr ')'
+    ;
 
 
 %%
+

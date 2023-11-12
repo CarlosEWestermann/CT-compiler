@@ -1,0 +1,1 @@
+syntax error, unexpected TK_LIT_FLOAT, expecting end of file

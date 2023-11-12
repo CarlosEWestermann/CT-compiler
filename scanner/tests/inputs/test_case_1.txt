@@ -1,5 +1,5 @@
-int x = 5; // Declaração de uma variável
-/* Isso é um
-comentário multi-linha */
-float y = 10.32;
-bool isTrue = false;
+3 + 4 * 5
+(3 + 4) * 5
+7 - 2 / 1
+(7 - 2) / 1
+10 % 3

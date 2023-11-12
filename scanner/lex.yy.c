@@ -521,7 +521,7 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 "scanner.l"
 #line 2 "scanner.l"
-#include "tokens.h"
+#include "parser.tab.h"
 #line 526 "lex.yy.c"
 #line 527 "lex.yy.c"
 

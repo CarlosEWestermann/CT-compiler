@@ -1,0 +1,1 @@
+syntax error, unexpected TK_LIT_INT, expecting TK_PR_INT or TK_PR_FLOAT or TK_PR_BOOL or ')'

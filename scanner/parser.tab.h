@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.5.1.  */
+/* A Bison parser, made by GNU Bison 3.8.2.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2020 Free Software Foundation,
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
    Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -31,8 +31,9 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* Undocumented macros, especially those whose name start with YY_,
-   are private implementation details.  Do not rely on them.  */
+/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+   especially those whose name start with YY_ or yy_.  They are
+   private implementation details that can be changed or removed.  */
 
 #ifndef YY_YY_PARSER_TAB_H_INCLUDED
 # define YY_YY_PARSER_TAB_H_INCLUDED
@@ -44,31 +45,37 @@
 extern int yydebug;
 #endif
 
-/* Token type.  */
+/* Token kinds.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
   enum yytokentype
   {
-    TK_PR_INT = 258,
-    TK_PR_FLOAT = 259,
-    TK_PR_BOOL = 260,
-    TK_PR_IF = 261,
-    TK_PR_ELSE = 262,
-    TK_PR_WHILE = 263,
-    TK_PR_RETURN = 264,
-    TK_OC_LE = 265,
-    TK_OC_GE = 266,
-    TK_OC_EQ = 267,
-    TK_OC_NE = 268,
-    TK_OC_AND = 269,
-    TK_OC_OR = 270,
-    TK_IDENTIFICADOR = 271,
-    TK_LIT_INT = 272,
-    TK_LIT_FLOAT = 273,
-    TK_LIT_FALSE = 274,
-    TK_LIT_TRUE = 275,
-    TK_ERRO = 276
+    YYEMPTY = -2,
+    YYEOF = 0,                     /* "end of file"  */
+    YYerror = 256,                 /* error  */
+    YYUNDEF = 257,                 /* "invalid token"  */
+    UMINUS = 258,                  /* UMINUS  */
+    TK_PR_INT = 259,               /* TK_PR_INT  */
+    TK_PR_FLOAT = 260,             /* TK_PR_FLOAT  */
+    TK_PR_BOOL = 261,              /* TK_PR_BOOL  */
+    TK_PR_IF = 262,                /* TK_PR_IF  */
+    TK_PR_ELSE = 263,              /* TK_PR_ELSE  */
+    TK_PR_WHILE = 264,             /* TK_PR_WHILE  */
+    TK_PR_RETURN = 265,            /* TK_PR_RETURN  */
+    TK_OC_LE = 266,                /* TK_OC_LE  */
+    TK_OC_GE = 267,                /* TK_OC_GE  */
+    TK_OC_EQ = 268,                /* TK_OC_EQ  */
+    TK_OC_NE = 269,                /* TK_OC_NE  */
+    TK_OC_AND = 270,               /* TK_OC_AND  */
+    TK_OC_OR = 271,                /* TK_OC_OR  */
+    TK_IDENTIFICADOR = 272,        /* TK_IDENTIFICADOR  */
+    TK_LIT_INT = 273,              /* TK_LIT_INT  */
+    TK_LIT_FLOAT = 274,            /* TK_LIT_FLOAT  */
+    TK_LIT_FALSE = 275,            /* TK_LIT_FALSE  */
+    TK_LIT_TRUE = 276,             /* TK_LIT_TRUE  */
+    TK_ERRO = 277                  /* TK_ERRO  */
   };
+  typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */
@@ -81,6 +88,8 @@ typedef int YYSTYPE;
 
 extern YYSTYPE yylval;
 
+
 int yyparse (void);
+
 
 #endif /* !YY_YY_PARSER_TAB_H_INCLUDED  */
