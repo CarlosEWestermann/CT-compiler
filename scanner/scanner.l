@@ -44,7 +44,7 @@ return return TK_PR_RETURN;
 ";" return ';';
 
 [0-9]+ return TK_LIT_INT;
-[-+]?([0-9]*\.[0-9]+|[0-9]+\.)?([0-9]+)? return TK_LIT_FLOAT;
+([0-9]*\.[0-9]+|[0-9]+\.)?([0-9]+)? return TK_LIT_FLOAT;
 "false" return TK_LIT_FALSE;
 "true" return TK_LIT_TRUE;
 

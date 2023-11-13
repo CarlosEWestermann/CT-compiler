@@ -14,10 +14,10 @@
 %%
 
 program: /* empty */
-       | program element;
+    | program element;
 
 element: function
-       | global_declaration;
+    | global_declaration;
 
 global_declaration: type list_vars ';';
 
@@ -57,19 +57,13 @@ local_var_dec: type list_vars;
 
 attrib: TK_IDENTIFICADOR '=' expr;
 
-function_call
-    : TK_IDENTIFICADOR '(' arg_list ')'
-    | TK_IDENTIFICADOR '(' ')'
-    ;
+function_call: TK_IDENTIFICADOR '(' arg_list ')'
+    | TK_IDENTIFICADOR '(' ')';
 
-arg_list
-    : arg
-    | arg_list ',' arg
-    ;
+arg_list: arg
+    | arg_list ',' arg;
 
-arg
-    : expr
-    ;
+arg: expr;
 
 return: TK_PR_RETURN expr;
 
@@ -80,59 +74,42 @@ while: TK_PR_WHILE '(' expr ')' '{' command_list '}';
 
 expr: logical_or_expr;
 
-logical_or_expr
-    : logical_and_expr
-    | logical_or_expr TK_OC_OR logical_and_expr
-    ;
+logical_or_expr: logical_and_expr
+    | logical_or_expr TK_OC_OR logical_and_expr;
 
-logical_and_expr
-    : equality_expr
-    | logical_and_expr TK_OC_AND equality_expr
-    ;
+logical_and_expr: equality_expr
+    | logical_and_expr TK_OC_AND equality_expr;
 
-equality_expr
-    : relational_expr
+equality_expr: relational_expr
     | equality_expr TK_OC_EQ relational_expr
-    | equality_expr TK_OC_NE relational_expr
-    ;
+    | equality_expr TK_OC_NE relational_expr;
 
-relational_expr
-    : add_sub_expr
+relational_expr: add_sub_expr
     | relational_expr '<' add_sub_expr
     | relational_expr '>' add_sub_expr
     | relational_expr TK_OC_LE add_sub_expr
-    | relational_expr TK_OC_GE add_sub_expr
-    ;
+    | relational_expr TK_OC_GE add_sub_expr;
 
-add_sub_expr
-    : mult_div_mod_expr
+add_sub_expr: mult_div_mod_expr
     | add_sub_expr '+' mult_div_mod_expr
-    | add_sub_expr '-' mult_div_mod_expr
-    ;
+    | add_sub_expr '-' mult_div_mod_expr;
 
-mult_div_mod_expr
-    : unary_expr
+mult_div_mod_expr: unary_expr
     | mult_div_mod_expr '*' unary_expr
     | mult_div_mod_expr '/' unary_expr
-    | mult_div_mod_expr '%' unary_expr
-    ;
+    | mult_div_mod_expr '%' unary_expr;
 
-unary_expr
-    : primary_expr
+unary_expr: primary_expr
     | '-' primary_expr %prec UMINUS
-    | '!' primary_expr
-    ;
+    | '!' primary_expr;
 
-primary_expr
-    : TK_IDENTIFICADOR
+primary_expr: TK_IDENTIFICADOR
     | TK_LIT_INT
     | TK_LIT_FLOAT
     | TK_LIT_TRUE
     | TK_LIT_FALSE
     | function_call
-    | '(' expr ')'
-    ;
+    | '(' expr ')';
 
 
 %%
-
