@@ -1,0 +1,22 @@
+Test Report
+
+test_case_1.txt: PASSED in .012856654 seconds
+test_case_2.txt: PASSED in .016168273 seconds
+test_case_3.txt: PASSED in .008150793 seconds
+test_case_4.txt: PASSED in .006119271 seconds
+test_case_5.txt: PASSED in .004916965 seconds
+test_case_6.txt: PASSED in .005561879 seconds
+test_case_7.txt: PASSED in .005083821 seconds
+test_case_8.txt: PASSED in .004964479 seconds
+test_case_9.txt: PASSED in .004738054 seconds
+test_case_10.txt: PASSED in .004911424 seconds
+test_case_11.txt: PASSED in .006134646 seconds
+test_case_12.txt: PASSED in .004619516 seconds
+test_case_13.txt: PASSED in .005442446 seconds
+test_case_14.txt: PASSED in .006438414 seconds
+test_case_15.txt: PASSED in .006063350 seconds
+test_case_16.txt: PASSED in .005767064 seconds
+test_case_17.txt: PASSED in .005260414 seconds
+test_case_18.txt: PASSED in .005494843 seconds
+
+18 tests passed out of 18 total tests.

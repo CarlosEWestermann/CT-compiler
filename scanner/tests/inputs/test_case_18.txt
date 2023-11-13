@@ -1,0 +1,6 @@
+(int a, int b, bool ll, float gremio) >= int! compare_inter {
+    {int a;};
+    {}; int b; {};{};{};{};{};{};{};
+    int a; int b; a = b;f(a,b,f(c));
+    if(a){}else{{};int a;{int a;};{};};
+}

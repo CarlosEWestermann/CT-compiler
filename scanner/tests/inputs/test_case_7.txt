@@ -1,0 +1,8 @@
+() >= int! nestedcontrol {
+    int i;
+    if (i % 2 == 0) {
+        while (i < 5) {
+            i = 1;
+        };
+    };
+}
