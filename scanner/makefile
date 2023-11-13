@@ -14,7 +14,7 @@ main.o: main.c parser.tab.h
 	$(CC) $< -c
 
 parser.tab.c parser.tab.h: parser.y
-	$(BISON) -d --report=state $< 
+	$(BISON) -d $< 
 
 parser.tab.o: parser.tab.c
 	$(CC) $< -c
