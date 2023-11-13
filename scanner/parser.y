@@ -1,3 +1,9 @@
+/*UFRGS 2023*/
+/*Carlos Eduardo Westermann - 00327212*/
+/*Théo Santiago Müller 00301593*/
+
+
+
 %{
     int yylex(void);
     void yyerror (char const *mensagem);
@@ -44,7 +50,12 @@ body: '{' '}'
     | '{' command_list '}';
 
 command_list: command
-            | command_list command;
+            | '{' command '}'';'
+            | '{' command_list command '}'';'
+            | command_list command
+            | command_list '{' command '}'';'
+            | command_list '{''}'';'
+            | '{''}'';';
 
 command: local_var_dec ';'
        | attrib ';'
@@ -67,10 +78,10 @@ arg: expr;
 
 return: TK_PR_RETURN expr;
 
-conditional: TK_PR_IF '(' expr ')' '{' command_list '}'
-            | TK_PR_IF '(' expr ')' '{' command_list '}' TK_PR_ELSE '{' command_list '}';
+conditional: TK_PR_IF '(' expr ')' body
+            | TK_PR_IF '(' expr ')' body TK_PR_ELSE body;
 
-while: TK_PR_WHILE '(' expr ')' '{' command_list '}';
+while: TK_PR_WHILE '(' expr ')' body;
 
 expr: logical_or_expr;
 
