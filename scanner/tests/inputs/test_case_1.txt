@@ -1,5 +1,6 @@
-3 + 4 * 5
-(3 + 4) * 5
-7 - 2 / 1
-(7 - 2) / 1
-10 % 3
+(int a, float b, bool c) >= int! minha_funcao {
+    int resultado;
+    resultado = a + b;
+    return resultado;
+    if (compare_results(true==false, a+b-2*5)) {return true;} else {return 1;};
+}

@@ -1,6 +1,5 @@
-5 < 3
-6 > 4
-7 <= 7
-8 >= 8
-9 == 9
-10 != 5
+(int a, float b, bool c) >= int! minha_funcao {
+    int resultado;
+    resultado = 1+ 2- 3;
+    return resultado;
+}

@@ -1,1 +1,0 @@
-syntax error, unexpected TK_LIT_TRUE, expecting end of file
