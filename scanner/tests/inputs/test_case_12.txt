@@ -1,3 +1,0 @@
-(int x, bool flag) int >= incorrectheaderfunction { // Incorrect order of return type and operator
-    return x;
-}

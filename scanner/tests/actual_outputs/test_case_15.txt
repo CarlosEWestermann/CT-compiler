@@ -1,1 +1,0 @@
-2: syntax error, unexpected TK_LIT_INT

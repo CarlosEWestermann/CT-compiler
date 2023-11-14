@@ -1,7 +1,0 @@
-(bool cond) >= bool! checkcondition {
-    if (cond & a) {
-        return true;
-    } else {
-        return compare_results(1 == 1, cond);
-    };
-}

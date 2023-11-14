@@ -1,5 +1,0 @@
-(int a, int b, bool ll, float gremio) >= int! compare_inter {
-    () >= bool! iririri {
-
-    }
-}

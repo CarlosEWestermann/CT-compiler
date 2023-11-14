@@ -1,4 +1,0 @@
-int globalvar // Missing semicolon here
-(bool flag) >= int! functionwitherror {
-    return 0;
-}

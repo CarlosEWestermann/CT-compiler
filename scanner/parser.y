@@ -1,4 +1,5 @@
 /*UFRGS 2023*/
+/* Grupo K */
 /*Carlos Eduardo Westermann - 00327212*/
 /*Théo Santiago Müller 00301593*/
 
@@ -111,8 +112,8 @@ mult_div_mod_expr: unary_expr
     | mult_div_mod_expr '%' unary_expr;
 
 unary_expr: primary_expr
-    | '-' primary_expr %prec UMINUS
-    | '!' primary_expr;
+          | '-' unary_expr %prec UMINUS
+          | '!' unary_expr;
 
 primary_expr: TK_IDENTIFICADOR
     | TK_LIT_INT
@@ -121,6 +122,5 @@ primary_expr: TK_IDENTIFICADOR
     | TK_LIT_FALSE
     | function_call
     | '(' expr ')';
-
 
 %%
