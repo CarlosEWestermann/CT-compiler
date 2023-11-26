@@ -55,6 +55,7 @@
 %type <tree> mult_div_mod_expr
 %type <tree> unary_expr
 %type <tree> primary_expr
+%type <tree> open_block
 
 
 %%
@@ -96,19 +97,20 @@ body: '{' '}' { $$ = asd_new("@empty_body"); }
     | '{' command_list '}' { $$ = $2; };
 
 command_list: command { $$ = $1; }
-            | '{' command '}'';' { $$ = $2; }
-            | '{' command_list command '}'';' { $$ = $2; asd_add_child($$, $3); }
             | command_list command { $$ = $1; asd_add_child($$, $2); }
-            | command_list '{' command '}'';' { $$ = $1; asd_add_child($$, $3); }
-            | command_list '{''}'';' { $$ = $1; }
-            | '{''}'';' { $$ = NULL; };
 
 command: local_var_dec ';' { $$ = $1; }
        | attrib ';' { $$ = $1; }
        | conditional ';' { $$ = $1; }
        | while ';' { $$ = $1; }
        | return ';' { $$ = $1; }
-       | function_call ';' { $$ = $1; } ;
+       | function_call ';' { $$ = $1; }
+       | open_block { $$ = $1; };
+
+open_block: '{''}'';' { $$ = asd_new("@empty_body"); }
+          | '{' command_list '}'';' { $$ = $2; };
+
+
 
 local_var_dec: type list_vars { $$ = $2; };
 

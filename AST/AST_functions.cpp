@@ -122,11 +122,11 @@ void _exporta(asd_tree_t* node){
     if(node == NULL or strcmp(node->label, "@empty_body") == 0){
         return;
     }
-    printf("\n%p [label=\"%s\"];", (void*)node, node->label);
+    printf("%p [label=\"%s\"];\n", (void*)node, node->label);
 
     for(int i = 0; i < node->number_of_children; i++){
         if(node->children[i] != NULL and strcmp(node->children[i]->label, "@empty_body")){
-            printf("%p, %p", (void*)node, (void*)node->children[i]);
+            printf("%p, %p\n", (void*)node, (void*)node->children[i]);
             _exporta(node->children[i]);
         }
     }
@@ -138,6 +138,7 @@ void exporta(void *arvore){
     if(root == NULL){
         printf("ERRO: arvore vazia");
     } else {
+        printf("\n");
         _exporta(root);
         asd_free(root);
     }
