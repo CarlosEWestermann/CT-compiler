@@ -14,6 +14,14 @@
 
 %token UMINUS
 
+%union {
+    struct {
+        int lineno;
+        int token_type;
+        char* token_value;
+    } valor_lexico;
+}
+
 %token TK_PR_INT TK_PR_FLOAT TK_PR_BOOL TK_PR_IF TK_PR_ELSE TK_PR_WHILE TK_PR_RETURN
 %token TK_OC_LE TK_OC_GE TK_OC_EQ TK_OC_NE TK_OC_AND TK_OC_OR
 %token TK_IDENTIFICADOR TK_LIT_INT TK_LIT_FLOAT TK_LIT_FALSE TK_LIT_TRUE TK_ERRO

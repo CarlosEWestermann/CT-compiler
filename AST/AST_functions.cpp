@@ -139,8 +139,7 @@ void _exporta(asd_tree_t* node){
     }
 }
 
-void exporta(void *arvore)
-{
+void exporta(void *arvore){
     asd_tree_t *root = (asd_tree_t*) arvore;
 
     if(root == NULL){

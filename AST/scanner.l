@@ -18,7 +18,7 @@
 [ \t] {}
 \n {}
 
-int return TK_PR_INT;
+int {return TK_PR_INT;}
 float return TK_PR_FLOAT;
 bool return TK_PR_BOOL;
 if return TK_PR_IF;
@@ -48,12 +48,22 @@ return return TK_PR_RETURN;
 "," return ',';
 ";" return ';';
 
-[0-9]+ return TK_LIT_INT;
+[0-9]+ {
+    yylval.valor_lexico.lineno = yylineno;
+    yylval.valor_lexico.token_type = TK_LIT_INT;
+    yylval.valor_lexico.token_value = strdup(yytext);
+    return TK_LIT_INT;
+}
 ([0-9]*\.[0-9]+|[0-9]+\.)?([0-9]+)? return TK_LIT_FLOAT;
 "false" return TK_LIT_FALSE;
 "true" return TK_LIT_TRUE;
 
-[a-z_][a-z0-9_]* return TK_IDENTIFICADOR;
+[a-zA-Z_][a-zA-Z_0-9]* {
+    yylval.valor_lexico.lineno = yylineno;
+    yylval.valor_lexico.token_type = TK_IDENTIFICADOR;
+    yylval.valor_lexico.token_value = strdup(yytext);
+    return TK_IDENTIFICADOR;
+}
 
 . return TK_ERRO;
 
