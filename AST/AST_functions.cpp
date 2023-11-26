@@ -124,6 +124,28 @@ void asd_print_graphviz(asd_tree_t *tree)
     }
 }
 
+void _exporta(asd_tree_t* node){
+    if(node == NULL){
+        return;
+    }
+
+    printf("%p [label=\"%s\"];\n", (void*)node, node->label);
+
+    for(int i = 0; i < node->number_of_children; i++){
+        if(node->children[i] != NULL){
+            printf("%p, %p", (void*)node, (void*)node->children[i]);
+            _exporta(node->children[i]);
+        }
+    }
+}
+
 void exporta(void *arvore)
 {
+    asd_tree_t *root = (asd_tree_t*) arvore;
+
+    if(root == NULL){
+        printf("ERRO: arvore vazia");
+    } else {
+        _exporta(root);
+    }
 }
