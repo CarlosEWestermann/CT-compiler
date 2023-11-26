@@ -79,7 +79,7 @@ type: TK_PR_INT {  }
     | TK_PR_BOOL {  };
 
 list_vars: TK_IDENTIFICADOR { $$ = asd_new($1.token_value); free($1.token_value);}
-         | list_vars ',' TK_IDENTIFICADOR { $$ = asd_new(","); asd_add_child($$, $1); asd_add_child($$, asd_new($3.token_value)); free($3.token_value);};
+         | list_vars ',' TK_IDENTIFICADOR { $$ = $1; asd_add_child($$, asd_new($3.token_value)); free($3.token_value);};
 
 function: header body { $$ = $1; asd_add_child($$, $2); };
 
@@ -120,7 +120,7 @@ function_call: TK_IDENTIFICADOR '(' arg_list ')' { $$ = asd_new($1.token_value);
     | TK_IDENTIFICADOR '(' ')' { $$ = asd_new($1.token_value); free($1.token_value);};
 
 arg_list: arg { $$ = $1; }
-    | arg_list ',' arg { $$ = asd_new(","); asd_add_child($$, $1); asd_add_child($$, $3); };
+    | arg_list ',' arg { $$ = $1; asd_add_child($$, $3); };
 
 arg: expr { $$ = $1; };
 
