@@ -18,7 +18,7 @@
 [ \t] {}
 \n {}
 
-int {return TK_PR_INT;}
+int return TK_PR_INT;
 float return TK_PR_FLOAT;
 bool return TK_PR_BOOL;
 if return TK_PR_IF;
@@ -49,19 +49,34 @@ return return TK_PR_RETURN;
 ";" return ';';
 
 [0-9]+ {
-    yylval.valor_lexico.lineno = yylineno;
-    yylval.valor_lexico.token_type = TK_LIT_INT;
-    yylval.valor_lexico.token_value = strdup(yytext);
+    yylval.lexical_value.lineno = yylineno;
+    yylval.lexical_value.token_type = TK_LIT_INT;
+    yylval.lexical_value.token_value = strdup(yytext);
     return TK_LIT_INT;
 }
-([0-9]*\.[0-9]+|[0-9]+\.)?([0-9]+)? return TK_LIT_FLOAT;
-"false" return TK_LIT_FALSE;
-"true" return TK_LIT_TRUE;
+([0-9]*\.[0-9]+|[0-9]+\.)?([0-9]+)? {
+    yylval.lexical_value.lineno = yylineno;
+    yylval.lexical_value.token_type = TK_LIT_FLOAT;
+    yylval.lexical_value.token_value = strdup(yytext);
+    return TK_LIT_FLOAT;
+}
+"false" {
+    yylval.lexical_value.lineno = yylineno;
+    yylval.lexical_value.token_type = TK_LIT_FALSE;
+    yylval.lexical_value.token_value = strdup(yytext);
+    return TK_LIT_FALSE;
+}
+"true" {
+    yylval.lexical_value.lineno = yylineno;
+    yylval.lexical_value.token_type = TK_LIT_TRUE;
+    yylval.lexical_value.token_value = strdup(yytext);
+    return TK_LIT_TRUE;
+}
 
 [a-zA-Z_][a-zA-Z_0-9]* {
-    yylval.valor_lexico.lineno = yylineno;
-    yylval.valor_lexico.token_type = TK_IDENTIFICADOR;
-    yylval.valor_lexico.token_value = strdup(yytext);
+    yylval.lexical_value.lineno = yylineno;
+    yylval.lexical_value.token_type = TK_IDENTIFICADOR;
+    yylval.lexical_value.token_value = strdup(yytext);
     return TK_IDENTIFICADOR;
 }
 

@@ -1,14 +1,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "AST_functions.hpp"
 #define ARQUIVO_SAIDA "saida.dot"
-
-typedef struct asd_tree
-{
-    char *label;
-    int number_of_children;
-    struct asd_tree **children;
-} asd_tree_t;
 
 asd_tree_t *asd_new(const char *label)
 {
@@ -125,10 +119,9 @@ void asd_print_graphviz(asd_tree_t *tree)
 }
 
 void _exporta(asd_tree_t* node){
-    if(node == NULL){
+    if(node == NULL or node->label == "ignore"){
         return;
     }
-
     printf("%p [label=\"%s\"];\n", (void*)node, node->label);
 
     for(int i = 0; i < node->number_of_children; i++){
@@ -146,5 +139,7 @@ void exporta(void *arvore){
         printf("ERRO: arvore vazia");
     } else {
         _exporta(root);
+        asd_free(root);
     }
+    
 }
