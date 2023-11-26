@@ -59,7 +59,7 @@
 
 %%
 
-program: /* empty */ { $$ = NULL; arvore = $$;  }
+program: /* empty */ { $$ = NULL;  }
     | program element { if($1 != NULL) {
                             $$ = $1; 
                             asd_add_child($$, $2); 
@@ -77,22 +77,22 @@ type: TK_PR_INT {  }
     | TK_PR_FLOAT {  }
     | TK_PR_BOOL {  };
 
-list_vars: TK_IDENTIFICADOR { $$ = asd_new($1.token_value); }
-         | list_vars ',' TK_IDENTIFICADOR { $$ = asd_new(","); asd_add_child($$, $1); asd_add_child($$, asd_new($3.token_value)); };
+list_vars: TK_IDENTIFICADOR { $$ = asd_new($1.token_value); free($1.token_value);}
+         | list_vars ',' TK_IDENTIFICADOR { $$ = asd_new(","); asd_add_child($$, $1); asd_add_child($$, asd_new($3.token_value)); free($3.token_value);};
 
 function: header body { $$ = $1; asd_add_child($$, $2); };
 
 header: '(' param_list ')' TK_OC_GE type '!' function_name { $$ = $7; asd_add_child($$, $2); }
-       | '(' ')' TK_OC_GE type '!' TK_IDENTIFICADOR { $$ = asd_new($6.token_value); };
+       | '(' ')' TK_OC_GE type '!' TK_IDENTIFICADOR { $$ = asd_new($6.token_value); free($6.token_value);};
 
-function_name: TK_IDENTIFICADOR { $$ = asd_new($1.token_value); };
+function_name: TK_IDENTIFICADOR { $$ = asd_new($1.token_value); free($1.token_value);};
 
 param_list: param { $$ = $1; }
            | param_list ',' param { $$ = asd_new(","); asd_add_child($$, $1); asd_add_child($$, $3); };
 
-param: type TK_IDENTIFICADOR { $$ = asd_new($2.token_value); }; 
+param: type TK_IDENTIFICADOR { $$ = asd_new($2.token_value); free($2.token_value);}; 
 
-body: '{' '}' { $$ = asd_new("ignore"); }
+body: '{' '}' { $$ = asd_new("@empty_body"); }
     | '{' command_list '}' { $$ = $2; };
 
 command_list: command { $$ = $1; }
@@ -112,10 +112,10 @@ command: local_var_dec ';' { $$ = $1; }
 
 local_var_dec: type list_vars { $$ = $2; };
 
-attrib: TK_IDENTIFICADOR '=' expr { $$ = asd_new("="); asd_add_child($$, asd_new($1.token_value)); asd_add_child($$, $3); };
+attrib: TK_IDENTIFICADOR '=' expr { $$ = asd_new("="); asd_add_child($$, asd_new($1.token_value)); asd_add_child($$, $3); free($1.token_value);};
 
-function_call: TK_IDENTIFICADOR '(' arg_list ')' { $$ = asd_new($1.token_value); asd_add_child($$, $3); }
-    | TK_IDENTIFICADOR '(' ')' { $$ = asd_new($1.token_value); };
+function_call: TK_IDENTIFICADOR '(' arg_list ')' { $$ = asd_new($1.token_value); asd_add_child($$, $3); free($1.token_value);}
+    | TK_IDENTIFICADOR '(' ')' { $$ = asd_new($1.token_value); free($1.token_value);};
 
 arg_list: arg { $$ = $1; }
     | arg_list ',' arg { $$ = asd_new(","); asd_add_child($$, $1); asd_add_child($$, $3); };
@@ -160,11 +160,11 @@ unary_expr: primary_expr { $$ = $1; }
           | '-' unary_expr %prec UMINUS { $$ = asd_new("-"); asd_add_child($$, $2); }
           | '!' unary_expr { $$ = asd_new("!"); asd_add_child($$, $2); };
 
-primary_expr: TK_IDENTIFICADOR { $$ = asd_new($1.token_value); }
-    | TK_LIT_INT { $$ = asd_new($1.token_value); }
-    | TK_LIT_FLOAT { $$ = asd_new($1.token_value); }
-    | TK_LIT_TRUE { $$ = asd_new($1.token_value); }
-    | TK_LIT_FALSE { $$ = asd_new($1.token_value); }
+primary_expr: TK_IDENTIFICADOR { $$ = asd_new($1.token_value); free($1.token_value); }
+    | TK_LIT_INT { $$ = asd_new($1.token_value); free($1.token_value);}
+    | TK_LIT_FLOAT { $$ = asd_new($1.token_value); free($1.token_value);}
+    | TK_LIT_TRUE { $$ = asd_new($1.token_value); free($1.token_value);}
+    | TK_LIT_FALSE { $$ = asd_new($1.token_value); free($1.token_value);}
     | function_call { $$ = $1; }
     | '(' expr ')' { $$ = $2; };
 

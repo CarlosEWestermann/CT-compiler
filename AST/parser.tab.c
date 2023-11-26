@@ -1497,7 +1497,7 @@ yyreduce:
     {
   case 2: /* program: %empty  */
 #line 62 "parser.y"
-                     { (yyval.tree) = NULL; arvore = (yyval.tree);  }
+                     { (yyval.tree) = NULL;  }
 #line 1502 "parser.tab.c"
     break;
 
@@ -1551,13 +1551,13 @@ yyreduce:
 
   case 10: /* list_vars: TK_IDENTIFICADOR  */
 #line 80 "parser.y"
-                            { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); }
+                            { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); free((yyvsp[0].lexical_value).token_value);}
 #line 1556 "parser.tab.c"
     break;
 
   case 11: /* list_vars: list_vars ',' TK_IDENTIFICADOR  */
 #line 81 "parser.y"
-                                          { (yyval.tree) = asd_new(","); asd_add_child((yyval.tree), (yyvsp[-2].tree)); asd_add_child((yyval.tree), asd_new((yyvsp[0].lexical_value).token_value)); }
+                                          { (yyval.tree) = asd_new(","); asd_add_child((yyval.tree), (yyvsp[-2].tree)); asd_add_child((yyval.tree), asd_new((yyvsp[0].lexical_value).token_value)); free((yyvsp[0].lexical_value).token_value);}
 #line 1562 "parser.tab.c"
     break;
 
@@ -1575,13 +1575,13 @@ yyreduce:
 
   case 14: /* header: '(' ')' TK_OC_GE type '!' TK_IDENTIFICADOR  */
 #line 86 "parser.y"
-                                                    { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); }
+                                                    { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); free((yyvsp[0].lexical_value).token_value);}
 #line 1580 "parser.tab.c"
     break;
 
   case 15: /* function_name: TK_IDENTIFICADOR  */
 #line 88 "parser.y"
-                                { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); }
+                                { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); free((yyvsp[0].lexical_value).token_value);}
 #line 1586 "parser.tab.c"
     break;
 
@@ -1599,13 +1599,13 @@ yyreduce:
 
   case 18: /* param: type TK_IDENTIFICADOR  */
 #line 93 "parser.y"
-                             { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); }
+                             { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); free((yyvsp[0].lexical_value).token_value);}
 #line 1604 "parser.tab.c"
     break;
 
   case 19: /* body: '{' '}'  */
 #line 95 "parser.y"
-              { (yyval.tree) = asd_new("ignore"); }
+              { (yyval.tree) = asd_new("@empty_body"); }
 #line 1610 "parser.tab.c"
     break;
 
@@ -1701,19 +1701,19 @@ yyreduce:
 
   case 35: /* attrib: TK_IDENTIFICADOR '=' expr  */
 #line 115 "parser.y"
-                                  { (yyval.tree) = asd_new("="); asd_add_child((yyval.tree), asd_new((yyvsp[-2].lexical_value).token_value)); asd_add_child((yyval.tree), (yyvsp[0].tree)); }
+                                  { (yyval.tree) = asd_new("="); asd_add_child((yyval.tree), asd_new((yyvsp[-2].lexical_value).token_value)); asd_add_child((yyval.tree), (yyvsp[0].tree)); free((yyvsp[-2].lexical_value).token_value);}
 #line 1706 "parser.tab.c"
     break;
 
   case 36: /* function_call: TK_IDENTIFICADOR '(' arg_list ')'  */
 #line 117 "parser.y"
-                                                 { (yyval.tree) = asd_new((yyvsp[-3].lexical_value).token_value); asd_add_child((yyval.tree), (yyvsp[-1].tree)); }
+                                                 { (yyval.tree) = asd_new((yyvsp[-3].lexical_value).token_value); asd_add_child((yyval.tree), (yyvsp[-1].tree)); free((yyvsp[-3].lexical_value).token_value);}
 #line 1712 "parser.tab.c"
     break;
 
   case 37: /* function_call: TK_IDENTIFICADOR '(' ')'  */
 #line 118 "parser.y"
-                               { (yyval.tree) = asd_new((yyvsp[-2].lexical_value).token_value); }
+                               { (yyval.tree) = asd_new((yyvsp[-2].lexical_value).token_value); free((yyvsp[-2].lexical_value).token_value);}
 #line 1718 "parser.tab.c"
     break;
 
@@ -1899,31 +1899,31 @@ yyreduce:
 
   case 68: /* primary_expr: TK_IDENTIFICADOR  */
 #line 163 "parser.y"
-                               { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); }
+                               { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); free((yyvsp[0].lexical_value).token_value); }
 #line 1904 "parser.tab.c"
     break;
 
   case 69: /* primary_expr: TK_LIT_INT  */
 #line 164 "parser.y"
-                 { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); }
+                 { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); free((yyvsp[0].lexical_value).token_value);}
 #line 1910 "parser.tab.c"
     break;
 
   case 70: /* primary_expr: TK_LIT_FLOAT  */
 #line 165 "parser.y"
-                   { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); }
+                   { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); free((yyvsp[0].lexical_value).token_value);}
 #line 1916 "parser.tab.c"
     break;
 
   case 71: /* primary_expr: TK_LIT_TRUE  */
 #line 166 "parser.y"
-                  { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); }
+                  { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); free((yyvsp[0].lexical_value).token_value);}
 #line 1922 "parser.tab.c"
     break;
 
   case 72: /* primary_expr: TK_LIT_FALSE  */
 #line 167 "parser.y"
-                   { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); }
+                   { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); free((yyvsp[0].lexical_value).token_value);}
 #line 1928 "parser.tab.c"
     break;
 

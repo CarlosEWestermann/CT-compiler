@@ -25,13 +25,13 @@ void asd_free(asd_tree_t *tree);
 
 void asd_add_child(asd_tree_t *tree, asd_tree_t *child);
 
-static void _asd_print(FILE *foutput, asd_tree_t *tree, int profundidade);
+// static void _asd_print(FILE *foutput, asd_tree_t *tree, int profundidade);
 
-void asd_print(asd_tree_t *tree);
+// void asd_print(asd_tree_t *tree);
 
-static void _asd_print_graphviz(FILE *foutput, asd_tree_t *tree);
+// static void _asd_print_graphviz(FILE *foutput, asd_tree_t *tree);
 
-void asd_print_graphviz(asd_tree_t *tree);
+// void asd_print_graphviz(asd_tree_t *tree);
 
 void _exporta(asd_tree_t* node);
 

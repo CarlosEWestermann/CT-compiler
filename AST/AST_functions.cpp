@@ -50,82 +50,82 @@ void asd_add_child(asd_tree_t *tree, asd_tree_t *child)
     }
 }
 
-static void _asd_print(FILE *foutput, asd_tree_t *tree, int profundidade)
-{
-    int i;
-    if (tree != NULL)
-    {
-        fprintf(foutput, "%d%*s: Nó '%s' tem %d filhos:\n", profundidade, profundidade * 2, "", tree->label, tree->number_of_children);
-        for (i = 0; i < tree->number_of_children; i++)
-        {
-            _asd_print(foutput, tree->children[i], profundidade + 1);
-        }
-    }
-    else
-    {
-        printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
-    }
-}
+// static void _asd_print(FILE *foutput, asd_tree_t *tree, int profundidade)
+// {
+//     int i;
+//     if (tree != NULL)
+//     {
+//         fprintf(foutput, "%d%*s: Nó '%s' tem %d filhos:\n", profundidade, profundidade * 2, "", tree->label, tree->number_of_children);
+//         for (i = 0; i < tree->number_of_children; i++)
+//         {
+//             _asd_print(foutput, tree->children[i], profundidade + 1);
+//         }
+//     }
+//     else
+//     {
+//         printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
+//     }
+// }
 
-void asd_print(asd_tree_t *tree)
-{
-    FILE *foutput = stderr;
-    if (tree != NULL)
-    {
-        _asd_print(foutput, tree, 0);
-    }
-    else
-    {
-        printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
-    }
-}
+// void asd_print(asd_tree_t *tree)
+// {
+//     FILE *foutput = stderr;
+//     if (tree != NULL)
+//     {
+//         _asd_print(foutput, tree, 0);
+//     }
+//     else
+//     {
+//         printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
+//     }
+// }
 
-static void _asd_print_graphviz(FILE *foutput, asd_tree_t *tree)
-{
-    int i;
-    if (tree != NULL)
-    {
-        fprintf(foutput, "  %ld [ label=\"%s\" ];\n", (long)tree, tree->label);
-        for (i = 0; i < tree->number_of_children; i++)
-        {
-            fprintf(foutput, "  %ld -> %ld;\n", (long)tree, (long)tree->children[i]);
-            _asd_print_graphviz(foutput, tree->children[i]);
-        }
-    }
-    else
-    {
-        printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
-    }
-}
+// static void _asd_print_graphviz(FILE *foutput, asd_tree_t *tree)
+// {
+//     int i;
+//     if (tree != NULL)
+//     {
+//         fprintf(foutput, "  %ld [ label=\"%s\" ];\n", (long)tree, tree->label);
+//         for (i = 0; i < tree->number_of_children; i++)
+//         {
+//             fprintf(foutput, "  %ld -> %ld;\n", (long)tree, (long)tree->children[i]);
+//             _asd_print_graphviz(foutput, tree->children[i]);
+//         }
+//     }
+//     else
+//     {
+//         printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
+//     }
+// }
 
-void asd_print_graphviz(asd_tree_t *tree)
-{
-    FILE *foutput = fopen(ARQUIVO_SAIDA, "w+");
-    if (foutput == NULL)
-    {
-        printf("Erro: %s não pude abrir o arquivo [%s] para escrita.\n", __FUNCTION__, ARQUIVO_SAIDA);
-    }
-    if (tree != NULL)
-    {
-        fprintf(foutput, "digraph grafo {\n");
-        _asd_print_graphviz(foutput, tree);
-        fprintf(foutput, "}\n");
-        fclose(foutput);
-    }
-    else
-    {
-        printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
-    }
-}
+// void asd_print_graphviz(asd_tree_t *tree)
+// {
+//     FILE *foutput = fopen(ARQUIVO_SAIDA, "w+");
+//     if (foutput == NULL)
+//     {
+//         printf("Erro: %s não pude abrir o arquivo [%s] para escrita.\n", __FUNCTION__, ARQUIVO_SAIDA);
+//     }
+//     if (tree != NULL)
+//     {
+//         fprintf(foutput, "digraph grafo {\n");
+//         _asd_print_graphviz(foutput, tree);
+//         fprintf(foutput, "}\n");
+//         fclose(foutput);
+//     }
+//     else
+//     {
+//         printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
+//     }
+// }
 
 void _exporta(asd_tree_t* node){
-    if(node == NULL or node->label == "ignore"){
+    if(node == NULL or strcmp(node->label, "@empty_body") == 0){
         return;
     }
-    printf("%p [label=\"%s\"];\n", (void*)node, node->label);
+    printf("\n%p [label=\"%s\"];", (void*)node, node->label);
 
     for(int i = 0; i < node->number_of_children; i++){
-        if(node->children[i] != NULL){
+        if(node->children[i] != NULL and strcmp(node->children[i]->label, "@empty_body")){
             printf("%p, %p", (void*)node, (void*)node->children[i]);
             _exporta(node->children[i]);
         }
