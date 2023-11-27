@@ -9,6 +9,8 @@
     int yylex(void);
     void yyerror (char const *mensagem);
     extern void *arvore;
+
+
 %}
 
 %define parse.error verbose
@@ -116,8 +118,23 @@ local_var_dec: type list_vars { $$ = $2; };
 
 attrib: TK_IDENTIFICADOR '=' expr { $$ = asd_new("="); asd_add_child($$, asd_new($1.token_value)); asd_add_child($$, $3); free($1.token_value);};
 
-function_call: TK_IDENTIFICADOR '(' arg_list ')' { $$ = asd_new($1.token_value); asd_add_child($$, $3); free($1.token_value);}
-    | TK_IDENTIFICADOR '(' ')' { $$ = asd_new($1.token_value); free($1.token_value);};
+function_call: TK_IDENTIFICADOR '(' arg_list ')' { 
+                    char *buffer = malloc((strlen("call ") + strlen($1.token_value) + 1)* sizeof(char));
+                    strcpy(buffer, "call ");
+                    strcat(buffer, $1.token_value);
+                    $$ = asd_new(buffer);
+                    asd_add_child($$, $3);
+                    free(buffer);
+                    free($1.token_value);
+                    }
+                | TK_IDENTIFICADOR '(' ')' { 
+                        char *buffer = malloc((strlen("call ") + strlen($1.token_value) + 1)* sizeof(char));
+                        strcpy(buffer, "call ");
+                        strcat(buffer, $1.token_value);
+                        $$ = asd_new(buffer);
+                        free(buffer);
+                        free($1.token_value);
+                    };
 
 arg_list: arg { $$ = $1; }
     | arg_list ',' arg { $$ = $1; asd_add_child($$, $3); };
