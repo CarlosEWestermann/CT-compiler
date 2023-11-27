@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "AST_functions.hpp"
+#include "AST_functions.h"
 #define ARQUIVO_SAIDA "saida.dot"
 
 asd_tree_t *asd_new(const char *label)
@@ -119,13 +119,13 @@ void asd_add_child(asd_tree_t *tree, asd_tree_t *child)
 // }
 
 void _exporta(asd_tree_t* node){
-    if(node == NULL or strcmp(node->label, "@empty_body") == 0){
+    if(node == NULL || strcmp(node->label, "@empty_body") == 0){
         return;
     }
     printf("%p [label=\"%s\"];\n", (void*)node, node->label);
 
     for(int i = 0; i < node->number_of_children; i++){
-        if(node->children[i] != NULL and strcmp(node->children[i]->label, "@empty_body")){
+        if(node->children[i] != NULL && strcmp(node->children[i]->label, "@empty_body")){
             printf("%p, %p\n", (void*)node, (void*)node->children[i]);
             _exporta(node->children[i]);
         }

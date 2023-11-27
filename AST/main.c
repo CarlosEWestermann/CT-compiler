@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "AST_functions.hpp"
+#include "AST_functions.h"
 extern int yyparse(void);
 extern int yylex_destroy(void);
 

@@ -3,7 +3,7 @@
 /*Carlos Eduardo Westermann - 00327212*/
 /*Théo Santiago Müller 00301593*/
 
-%code requires { #include "AST_functions.hpp" }
+%code requires { #include "AST_functions.h" }
 
 %{
     int yylex(void);
