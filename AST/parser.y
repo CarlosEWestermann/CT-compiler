@@ -9,8 +9,6 @@
     int yylex(void);
     void yyerror (char const *mensagem);
     extern void *arvore;
-
-
 %}
 
 %define parse.error verbose
@@ -85,15 +83,15 @@ list_vars: TK_IDENTIFICADOR { $$ = asd_new($1.token_value); free($1.token_value)
 
 function: header body { $$ = $1; asd_add_child($$, $2); };
 
-header: '(' param_list ')' TK_OC_GE type '!' function_name { $$ = $7; asd_add_child($$, $2); }
-       | '(' ')' TK_OC_GE type '!' TK_IDENTIFICADOR { $$ = asd_new($6.token_value); free($6.token_value);};
+header: '(' param_list ')' TK_OC_GE type '!' function_name { $$ = $7; }
+       | '(' ')' TK_OC_GE type '!' TK_IDENTIFICADOR { $$ = asd_new($6.token_value); free($6.token_value); };
 
-function_name: TK_IDENTIFICADOR { $$ = asd_new($1.token_value); free($1.token_value);};
+function_name: TK_IDENTIFICADOR { $$ = asd_new($1.token_value); free($1.token_value); };
 
-param_list: param { $$ = $1; }
-           | param_list ',' param { $$ = asd_new(","); asd_add_child($$, $1); asd_add_child($$, $3); };
+param_list: param {  }
+           | param_list ',' param {  };
 
-param: type TK_IDENTIFICADOR { $$ = asd_new($2.token_value); free($2.token_value);}; 
+param: type TK_IDENTIFICADOR { free($2.token_value); }; 
 
 body: '{' '}' { $$ = asd_new("@empty_body"); }
     | '{' command_list '}' { $$ = $2; };
@@ -127,7 +125,7 @@ function_call: TK_IDENTIFICADOR '(' arg_list ')' {
                     free(buffer);
                     free($1.token_value);
                     }
-                | TK_IDENTIFICADOR '(' ')' { 
+    | TK_IDENTIFICADOR '(' ')' { 
                         char *buffer = malloc((strlen("call ") + strlen($1.token_value) + 1)* sizeof(char));
                         strcpy(buffer, "call ");
                         strcat(buffer, $1.token_value);
