@@ -80,7 +80,7 @@ type: TK_PR_INT {  }
 list_vars: TK_IDENTIFICADOR { $$ = NULL; free($1.token_value);}
         | list_vars ',' TK_IDENTIFICADOR { $$ = $1; free($3.token_value);};
 
-function: header body { if($2 != NULL){$$ = $1; asd_add_child($$, $2);} else { $$ = NULL;}; };
+function: header body { $$ = $1; asd_add_child($$, $2); };
 
 header: '(' param_list ')' TK_OC_GE type '!' function_name { $$ = $7; }
         | '(' ')' TK_OC_GE type '!' TK_IDENTIFICADOR { $$ = asd_new($6.token_value); free($6.token_value); };
