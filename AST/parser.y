@@ -57,7 +57,6 @@
 %type <tree> primary_expr
 %type <tree> open_block
 
-
 %%
 
 program: /* empty */ { $$ = NULL;  }
@@ -78,8 +77,8 @@ type: TK_PR_INT {  }
     | TK_PR_FLOAT {  }
     | TK_PR_BOOL {  };
 
-list_vars: TK_IDENTIFICADOR { $$ = asd_new($1.token_value); free($1.token_value);}
-         | list_vars ',' TK_IDENTIFICADOR { $$ = $1; asd_add_child($$, asd_new($3.token_value)); free($3.token_value);};
+list_vars: TK_IDENTIFICADOR { $$ = NULL; free($1.token_value);}
+        | list_vars ',' TK_IDENTIFICADOR { $$ = $1; free($3.token_value);};
 
 function: header body { $$ = $1; asd_add_child($$, $2); };
 
@@ -167,10 +166,10 @@ while: TK_PR_WHILE '(' expr ')' body { $$ = asd_new("while"); asd_add_child($$, 
 expr: logical_or_expr { $$ = $1; };
 
 logical_or_expr: logical_and_expr { $$ = $1; }
-    | logical_or_expr TK_OC_OR logical_and_expr {$$ = asd_new("||"); asd_add_child($$, $1); asd_add_child($$, $3); };
+    | logical_or_expr TK_OC_OR logical_and_expr {$$ = asd_new("|"); asd_add_child($$, $1); asd_add_child($$, $3); };
 
 logical_and_expr: equality_expr { $$ = $1; }
-    | logical_and_expr TK_OC_AND equality_expr { $$ = asd_new("&&"); asd_add_child($$, $1); asd_add_child($$, $3); };
+    | logical_and_expr TK_OC_AND equality_expr { $$ = asd_new("&"); asd_add_child($$, $1); asd_add_child($$, $3); };
 
 equality_expr: relational_expr { $$ = $1; }
     | equality_expr TK_OC_EQ relational_expr { $$ = asd_new("=="); asd_add_child($$, $1); asd_add_child($$, $3); }

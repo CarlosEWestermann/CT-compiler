@@ -17,7 +17,8 @@ for str in "${strings[@]}"; do
         echo "Processing file: $file"
 
         # Run the executable with the file
-        $executable < "$file"
+        $executable < "$file" > "output"
+        sudo bash output2dot.sh < output | xdot -
 
         # Check the exit code of the executable
         if [ $? -eq 0 ]; then
