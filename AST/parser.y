@@ -60,7 +60,7 @@
 %%
 
 program: /* empty */ { $$ = NULL;  }
-    | program element { if($1 != NULL) {
+    | element program { if($1 != NULL) {
                             $$ = $1; 
                             asd_add_child($$, $2); 
                         } else {
@@ -83,12 +83,12 @@ list_vars: TK_IDENTIFICADOR { $$ = NULL; free($1.token_value);}
 function: header body { $$ = $1; asd_add_child($$, $2); };
 
 header: '(' param_list ')' TK_OC_GE type '!' function_name { $$ = $7; }
-       | '(' ')' TK_OC_GE type '!' TK_IDENTIFICADOR { $$ = asd_new($6.token_value); free($6.token_value); };
+        | '(' ')' TK_OC_GE type '!' TK_IDENTIFICADOR { $$ = asd_new($6.token_value); free($6.token_value); };
 
 function_name: TK_IDENTIFICADOR { $$ = asd_new($1.token_value); free($1.token_value); };
 
 param_list: param {  }
-           | param_list ',' param {  };
+            | param_list ',' param {  };
 
 param: type TK_IDENTIFICADOR { free($2.token_value); }; 
 
@@ -118,15 +118,15 @@ command_list: command { $$ = $1; }
 
 
 command: local_var_dec ';' { $$ = $1; }
-       | attrib ';' { $$ = $1; }
-       | conditional ';' { $$ = $1; }
-       | while ';' { $$ = $1; }
-       | return ';' { $$ = $1; }
-       | function_call ';' { $$ = $1; }
-       | open_block { $$ = $1; };
+        | attrib ';' { $$ = $1; }
+        | conditional ';' { $$ = $1; }
+        | while ';' { $$ = $1; }
+        | return ';' { $$ = $1; }
+        | function_call ';' { $$ = $1; }
+        | open_block { $$ = $1; };
 
 open_block: '{''}'';' { $$ = NULL; }
-          | '{' command_list '}'';' { $$ = $2; };
+            | '{' command_list '}'';' { $$ = $2; };
 
 
 local_var_dec: type list_vars { $$ = $2; };
@@ -142,7 +142,7 @@ function_call: TK_IDENTIFICADOR '(' arg_list ')' {
                     free(buffer);
                     free($1.token_value);
                     }
-    | TK_IDENTIFICADOR '(' ')' { 
+                | TK_IDENTIFICADOR '(' ')' { 
                         char *buffer = malloc((strlen("call ") + strlen($1.token_value) + 1)* sizeof(char));
                         strcpy(buffer, "call ");
                         strcat(buffer, $1.token_value);
@@ -158,8 +158,21 @@ arg: expr { $$ = $1; };
 
 return: TK_PR_RETURN expr { $$ = asd_new("return"); asd_add_child($$, $2); };
 
-conditional: TK_PR_IF '(' expr ')' body { $$ = asd_new("if"); asd_add_child($$, $3); asd_add_child($$, $5); }
-            | TK_PR_IF '(' expr ')' body TK_PR_ELSE body  { $$ = asd_new("if"); asd_add_child($$, $3); asd_add_child($$, $5); asd_add_child($$, $7); };
+conditional: TK_PR_IF '(' expr ')' body { if($5 != NULL){
+                                            $$ = asd_new("if"); asd_add_child($$, $3); asd_add_child($$, $5); 
+                                            } else {
+                                                $$ = NULL; 
+                                            };}
+            | TK_PR_IF '(' expr ')' body TK_PR_ELSE body  { if($5 != NULL || $7 != NULL){
+                                                                $$ = asd_new("if");
+                                                                asd_add_child($$, $3);
+                                                                if($5 != NULL)
+                                                                    asd_add_child($$, $5);
+                                                                if($7 != NULL)
+                                                                    asd_add_child($$, $7);
+                                                            } else {
+                                                                $$ = NULL; 
+                                                            };}
 
 while: TK_PR_WHILE '(' expr ')' body { $$ = asd_new("while"); asd_add_child($$, $3); asd_add_child($$, $5); };
 
@@ -191,8 +204,8 @@ mult_div_mod_expr: unary_expr { $$ = $1; }
     | mult_div_mod_expr '%' unary_expr { $$ = asd_new("%"); asd_add_child($$, $1); asd_add_child($$, $3); };
 
 unary_expr: primary_expr { $$ = $1; }
-          | '-' unary_expr %prec UMINUS { $$ = asd_new("-"); asd_add_child($$, $2); }
-          | '!' unary_expr { $$ = asd_new("!"); asd_add_child($$, $2); };
+        | '-' unary_expr %prec UMINUS { $$ = asd_new("-"); asd_add_child($$, $2); }
+        | '!' unary_expr { $$ = asd_new("!"); asd_add_child($$, $2); };
 
 primary_expr: TK_IDENTIFICADOR { $$ = asd_new($1.token_value); free($1.token_value); }
     | TK_LIT_INT { $$ = asd_new($1.token_value); free($1.token_value);}
