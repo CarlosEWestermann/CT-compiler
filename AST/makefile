@@ -6,8 +6,7 @@
 CC = gcc
 BISON = bison
 FLEX = flex
-SANITIZE = -fsanitize=address -g
-CFLAGS = -Wall -Wno-unused-function $(SANITIZE)
+CFLAGS = -Wall -Wno-unused-function 
 
 OBJECTS = main.o scanner_functions.o AST_functions.o parser.tab.o lex.yy.o
 EXECUTABLE = etapa3
