@@ -35,10 +35,6 @@ void asd_free(asd_tree_t *tree)
         free(tree->children);
         free(tree);
     }
-    else
-    {
-        printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
-    }
 }
 
 void asd_add_child(asd_tree_t *tree, asd_tree_t *child)
@@ -49,10 +45,7 @@ void asd_add_child(asd_tree_t *tree, asd_tree_t *child)
         tree->children = (asd_tree_t **)realloc(tree->children, tree->number_of_children * sizeof(asd_tree_t *));
         tree->children[tree->number_of_children - 1] = child;
     }
-/*    else
-    {
-        printf("Erro: %s recebeu parâmetro tree = %p / %p.\n", __FUNCTION__, tree, child);
-    }*/
+
 }
 
 void _exporta(asd_tree_t* node){
@@ -71,13 +64,8 @@ void _exporta(asd_tree_t* node){
 
 void exporta(void *arvore){
     asd_tree_t *root = (asd_tree_t*) arvore;
-
-    if(root == NULL){
-        printf("ERRO: arvore vazia");
-    } else {
-        printf("\n");
+    if(root != NULL){
         _exporta(root);
         asd_free(root);
-    }
-    
+    } 
 }
