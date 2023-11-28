@@ -80,7 +80,7 @@ type: TK_PR_INT {  }
 list_vars: TK_IDENTIFICADOR { $$ = NULL; free($1.token_value);}
         | list_vars ',' TK_IDENTIFICADOR { $$ = $1; free($3.token_value);};
 
-function: header body { $$ = $1; asd_add_child($$, $2); };
+function: header body { if($2 != NULL){$$ = $1; asd_add_child($$, $2);} else { $$ = NULL;}; };
 
 header: '(' param_list ')' TK_OC_GE type '!' function_name { $$ = $7; }
         | '(' ')' TK_OC_GE type '!' TK_IDENTIFICADOR { $$ = asd_new($6.token_value); free($6.token_value); };
@@ -158,23 +158,10 @@ arg: expr { $$ = $1; };
 
 return: TK_PR_RETURN expr { $$ = asd_new("return"); asd_add_child($$, $2); };
 
-conditional: TK_PR_IF '(' expr ')' body { if($5 != NULL){
-                                            $$ = asd_new("if"); asd_add_child($$, $3); asd_add_child($$, $5); 
-                                            } else {
-                                                $$ = NULL; 
-                                            };}
-            | TK_PR_IF '(' expr ')' body TK_PR_ELSE body  { if($5 != NULL || $7 != NULL){
-                                                                $$ = asd_new("if");
-                                                                asd_add_child($$, $3);
-                                                                if($5 != NULL)
-                                                                    asd_add_child($$, $5);
-                                                                if($7 != NULL)
-                                                                    asd_add_child($$, $7);
-                                                            } else {
-                                                                $$ = NULL; 
-                                                            };}
+conditional: TK_PR_IF '(' expr ')' body { $$ = asd_new("if"); asd_add_child($$, $3); asd_add_child($$, $5); }
+            | TK_PR_IF '(' expr ')' body TK_PR_ELSE body  { $$ = asd_new("if"); asd_add_child($$, $3); asd_add_child($$, $5); asd_add_child($$, $7);}
 
-while: TK_PR_WHILE '(' expr ')' body { $$ = asd_new("while"); asd_add_child($$, $3); asd_add_child($$, $5); };
+while: TK_PR_WHILE '(' expr ')' body { $$ = asd_new("while"); asd_add_child($$, $3); asd_add_child($$, $5); }
 
 expr: logical_or_expr { $$ = $1; };
 
