@@ -1,3 +1,8 @@
+/*UFRGS 2023*/
+/* Grupo K */
+/*Carlos Eduardo Westermann - 00327212*/
+/*Théo Santiago Müller 00301593*/
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -49,74 +54,6 @@ void asd_add_child(asd_tree_t *tree, asd_tree_t *child)
         printf("Erro: %s recebeu parâmetro tree = %p / %p.\n", __FUNCTION__, tree, child);
     }*/
 }
-
-// static void _asd_print(FILE *foutput, asd_tree_t *tree, int profundidade)
-// {
-//     int i;
-//     if (tree != NULL)
-//     {
-//         fprintf(foutput, "%d%*s: Nó '%s' tem %d filhos:\n", profundidade, profundidade * 2, "", tree->label, tree->number_of_children);
-//         for (i = 0; i < tree->number_of_children; i++)
-//         {
-//             _asd_print(foutput, tree->children[i], profundidade + 1);
-//         }
-//     }
-//     else
-//     {
-//         printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
-//     }
-// }
-
-// void asd_print(asd_tree_t *tree)
-// {
-//     FILE *foutput = stderr;
-//     if (tree != NULL)
-//     {
-//         _asd_print(foutput, tree, 0);
-//     }
-//     else
-//     {
-//         printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
-//     }
-// }
-
-// static void _asd_print_graphviz(FILE *foutput, asd_tree_t *tree)
-// {
-//     int i;
-//     if (tree != NULL)
-//     {
-//         fprintf(foutput, "  %ld [ label=\"%s\" ];\n", (long)tree, tree->label);
-//         for (i = 0; i < tree->number_of_children; i++)
-//         {
-//             fprintf(foutput, "  %ld -> %ld;\n", (long)tree, (long)tree->children[i]);
-//             _asd_print_graphviz(foutput, tree->children[i]);
-//         }
-//     }
-//     else
-//     {
-//         printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
-//     }
-// }
-
-// void asd_print_graphviz(asd_tree_t *tree)
-// {
-//     FILE *foutput = fopen(ARQUIVO_SAIDA, "w+");
-//     if (foutput == NULL)
-//     {
-//         printf("Erro: %s não pude abrir o arquivo [%s] para escrita.\n", __FUNCTION__, ARQUIVO_SAIDA);
-//     }
-//     if (tree != NULL)
-//     {
-//         fprintf(foutput, "digraph grafo {\n");
-//         _asd_print_graphviz(foutput, tree);
-//         fprintf(foutput, "}\n");
-//         fclose(foutput);
-//     }
-//     else
-//     {
-//         printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
-//     }
-// }
 
 void _exporta(asd_tree_t* node){
     if(node == NULL ){
