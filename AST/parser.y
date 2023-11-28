@@ -93,11 +93,30 @@ param_list: param {  }
 
 param: type TK_IDENTIFICADOR { free($2.token_value); }; 
 
-body: '{' '}' { $$ = asd_new("@empty_body"); }
+body: '{' '}' { $$ = NULL; }
     | '{' command_list '}' { $$ = $2; };
 
 command_list: command { $$ = $1; }
-            | command_list command { $$ = $1; asd_add_child($$, $2); }
+            | command command_list {if ($1 == NULL){
+                    $$ = $2;
+                }
+                else {
+                    $$ = $1;
+                    while ($$->next!=NULL) {
+                        $$ = $$->next;
+                    }
+                    // percorre lista de comandos chamados
+                    // quando não tem outro comando encadeado
+                    // só adiciona o próximo como filho
+                    asd_add_child($$, $2);
+                    // aponta como próximo o segundo comando da produção
+                    $$->next=$2;
+                    // retorna ao começo da lista de comandos
+                    // pra não perder a referência do bloco da função principal
+                    $$ = $1;
+                };}
+
+
 
 command: local_var_dec ';' { $$ = $1; }
        | attrib ';' { $$ = $1; }
@@ -107,9 +126,8 @@ command: local_var_dec ';' { $$ = $1; }
        | function_call ';' { $$ = $1; }
        | open_block { $$ = $1; };
 
-open_block: '{''}'';' { $$ = asd_new("@empty_body"); }
+open_block: '{''}'';' { $$ = NULL; }
           | '{' command_list '}'';' { $$ = $2; };
-
 
 
 local_var_dec: type list_vars { $$ = $2; };
@@ -135,7 +153,7 @@ function_call: TK_IDENTIFICADOR '(' arg_list ')' {
                     };
 
 arg_list: arg { $$ = $1; }
-    | arg_list ',' arg { $$ = $1; asd_add_child($$, $3); };
+    | arg ',' arg_list { $$ = $1; asd_add_child($$, $3); };
 
 arg: expr { $$ = $1; };
 

@@ -26,8 +26,8 @@ void asd_free(asd_tree_t *tree)
         {
             asd_free(tree->children[i]);
         }
-        free(tree->children);
         free(tree->label);
+        free(tree->children);
         free(tree);
     }
     else
@@ -44,10 +44,10 @@ void asd_add_child(asd_tree_t *tree, asd_tree_t *child)
         tree->children = (asd_tree_t **)realloc(tree->children, tree->number_of_children * sizeof(asd_tree_t *));
         tree->children[tree->number_of_children - 1] = child;
     }
-    else
+/*    else
     {
         printf("Erro: %s recebeu parâmetro tree = %p / %p.\n", __FUNCTION__, tree, child);
-    }
+    }*/
 }
 
 // static void _asd_print(FILE *foutput, asd_tree_t *tree, int profundidade)
@@ -119,13 +119,13 @@ void asd_add_child(asd_tree_t *tree, asd_tree_t *child)
 // }
 
 void _exporta(asd_tree_t* node){
-    if(node == NULL || strcmp(node->label, "@empty_body") == 0){
+    if(node == NULL ){
         return;
     }
     printf("%p [label=\"%s\"];\n", (void*)node, node->label);
 
     for(int i = 0; i < node->number_of_children; i++){
-        if(node->children[i] != NULL && strcmp(node->children[i]->label, "@empty_body")){
+        if(node->children[i] != NULL ){
             printf("%p, %p\n", (void*)node, (void*)node->children[i]);
             _exporta(node->children[i]);
         }

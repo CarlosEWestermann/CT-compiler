@@ -17,6 +17,7 @@ typedef struct asd_tree {
     char *label;
     int number_of_children;
     struct asd_tree **children;
+    struct asd_tree *next; //next element of function call stack
 } asd_tree_t;
 
 asd_tree_t *asd_new(const char *label);
