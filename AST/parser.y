@@ -4,6 +4,7 @@
 /*Théo Santiago Müller 00301593*/
 
 %code requires { #include "AST_functions.h" }
+%code requires { #include "symbol_table.h" }
 
 %{
     int yylex(void);

@@ -1,15 +1,10 @@
-#UFRGS 2023
-#Grupo K
-#Carlos Eduardo Westermann - 00327212
-#Théo Santiago Müller 00301593
-
 CC = gcc
 BISON = bison
 FLEX = flex
 CFLAGS = -Wall -Wno-unused-function 
 
-OBJECTS = main.o scanner_functions.o AST_functions.o parser.tab.o lex.yy.o
-EXECUTABLE = etapa3
+OBJECTS = main.o scanner_functions.o AST_functions.o parser.tab.o lex.yy.o symbol_table.o
+EXECUTABLE = etapa4
 
 all: $(EXECUTABLE)
 
@@ -32,6 +27,9 @@ lex.yy.c: scanner.l
 	$(FLEX) $<
 
 lex.yy.o: lex.yy.c
+	$(CC) $(CFLAGS) $< -c
+
+symbol_table.o: symbol_table.c symbol_table.h
 	$(CC) $(CFLAGS) $< -c
 
 $(EXECUTABLE): $(OBJECTS)
