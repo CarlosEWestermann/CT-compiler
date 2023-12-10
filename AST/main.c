@@ -5,13 +5,16 @@
 
 #include <stdio.h>
 #include "AST_functions.h"
+#include "symbol_table.h"
 extern int yyparse(void);
 extern int yylex_destroy(void);
 
 void *arvore = NULL;
+TableStack tableStack; 
 
 int main (int argc, char **argv)
 {
+    tableStack.top = -1;
     int ret = yyparse(); 
     exporta (arvore);
     yylex_destroy();

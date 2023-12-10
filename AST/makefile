@@ -17,6 +17,9 @@ scanner_functions.o: scanner_functions.c
 main.o: main.c parser.tab.h 
 	$(CC) $(CFLAGS) $< -c
 
+symbol_table.o: symbol_table.c
+	$(CC) $(CFLAGS) $< -c
+
 parser.tab.c parser.tab.h: parser.y
 	$(BISON) -d $< 
 
@@ -27,9 +30,6 @@ lex.yy.c: scanner.l
 	$(FLEX) $<
 
 lex.yy.o: lex.yy.c
-	$(CC) $(CFLAGS) $< -c
-
-symbol_table.o: symbol_table.c symbol_table.h
 	$(CC) $(CFLAGS) $< -c
 
 $(EXECUTABLE): $(OBJECTS)

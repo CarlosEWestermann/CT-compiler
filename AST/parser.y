@@ -3,13 +3,14 @@
 /*Carlos Eduardo Westermann - 00327212*/
 /*Théo Santiago Müller 00301593*/
 
-%code requires { #include "AST_functions.h" }
-%code requires { #include "symbol_table.h" }
+%code top { #include "symbol_table.h" }
 
+%code requires { #include "AST_functions.h" }
 %{
     int yylex(void);
     void yyerror (char const *mensagem);
     extern void *arvore;
+    extern TableStack tableStack; 
 %}
 
 %define parse.error verbose
@@ -60,7 +61,9 @@
 
 %%
 
-program: /* empty */ { $$ = NULL;  }
+
+
+program: /* empty */ { $$ = NULL;  printf("%d",tableStack.top);}
     | element program { if($1 != NULL) {
                             $$ = $1; 
                             asd_add_child($$, $2); 
