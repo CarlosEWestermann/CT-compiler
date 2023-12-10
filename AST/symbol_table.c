@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MAX_SCOPES 100 // Defina o número máximo de escopos
+
+
 // Definição dos tipos de natureza do símbolo
 typedef enum {
     LITERAL,
@@ -35,6 +38,11 @@ typedef struct TableEntry {
 typedef struct {
     TableEntry* table[100]; // Array de ponteiros para as entradas na table (tamanho da table pode variar)
 } SymbolTable;
+
+typedef struct {
+    SymbolTable* stack[MAX_SCOPES]; // Array de ponteiros para as tabelas de símbolos
+    int top; // Índice do topo da pilha
+} TableStack;
 
 // Função para inserir um símbolo na table de símbolos
 void insertSymbol(SymbolTable* table, const char* key, int line, SymbolNature nature, SymbolType type, const char* value) {
@@ -89,30 +97,99 @@ void freeTable(SymbolTable* table) {
     }
 }
 
-int main() {
-    SymbolTable table;
-    memset(&table, 0, sizeof(SymbolTable)); // Inicializa a table com NULL
-
-    // Exemplo de uso: inserir símbolos na table
-    insertSymbol(&table, "x", 10, IDENTIFIER, "int", "5");
-    insertSymbol(&table, "y", 15, IDENTIFIER, "float", "3.14");
-    insertSymbol(&table, "pi", 20, LITERAL, "float", "3.14159");
-
-    // Exemplo de uso: buscar informações sobre um símbolo
-    const char* searchKey = "x";
-    SymbolData* data = lookupSymbol(&table, searchKey);
-    if (data != NULL) {
-        printf("datarmacoes sobre o simbolo '%s':\n", searchKey);
-        printf("Localizacao (linha): %d\n", data->line);
-        printf("Natureza: %d\n", data->nature);
-        printf("Tipo do dado: %s\n", data->type);
-        printf("Valor do token: %s\n", data->value);
+// Função para empilhar uma tabela de símbolos na pilha de escopos
+void pushScope(TableStack* stack, SymbolTable* table) {
+    if (stack->top < MAX_SCOPES - 1) {
+        stack->top++;
+        stack->stack[stack->top] = table;
     } else {
-        printf("Simbolo '%s' nao encontrado na table.\n", searchKey);
+        printf("Erro: Pilha de escopos cheia\n");
+    }
+}
+
+// Função para desempilhar uma tabela de símbolos da pilha de escopos
+void popScope(TableStack* stack) {
+    if (stack->top >= 0) {
+        stack->top--;
+    } else {
+        printf("Erro: Pilha de escopos vazia\n");
+    }
+}
+
+void insertSymbolWithScope(TableStack* stack, const char* key, int line, SymbolNature nature, SymbolType type, const char* value) {
+    if (lookupSymbolWithScope(stack, key) != NULL) {
+        printf("Erro: Identificador '%s' já declarado neste escopo\n", key);
+        return;
     }
 
-    // Liberar a memória alocada para a table de símbolos
-    freeTable(&table);
+    SymbolTable* currentScope = stack->stack[stack->top];
+    insertSymbol(currentScope, key, line, nature, type, value);
+}
+
+SymbolData* lookupSymbolWithScope(TableStack* stack, const char* key) {
+    for (int i = stack->top; i >= 0; i--) {
+        SymbolTable* currentScope = stack->stack[i];
+        SymbolData* symbol = lookupSymbol(currentScope, key);
+        if (symbol != NULL) {
+            return symbol;
+        }
+    }
+    return NULL;
+}
+
+
+int main() {
+    TableStack tableStack;
+    tableStack.top = -1; // Inicializa o topo da pilha como -1 (pilha vazia)
+
+    // Criando e empilhando um novo escopo
+    SymbolTable table1;
+    memset(&table1, 0, sizeof(SymbolTable));
+    pushScope(&tableStack, &table1);
+
+    // Inserindo símbolos no primeiro escopo
+    insertSymbolWithScope(&tableStack, "x", 10, IDENTIFIER, INT, "5");
+    insertSymbolWithScope(&tableStack, "y", 15, IDENTIFIER, FLOAT, "3.14");
+
+    // Criando e empilhando um segundo escopo
+    SymbolTable table2;
+    memset(&table2, 0, sizeof(SymbolTable));
+    pushScope(&tableStack, &table2);
+
+    // Inserindo símbolos no segundo escopo
+    insertSymbolWithScope(&tableStack, "z", 20, IDENTIFIER, BOOL, "true");
+    insertSymbolWithScope(&tableStack, "x", 25, IDENTIFIER, FLOAT, "2.718");
+
+    // Buscando símbolos em diferentes escopos
+    const char* searchKey1 = "x";
+    SymbolData* data1 = lookupSymbolWithScope(&tableStack, searchKey1);
+    if (data1 != NULL) {
+        printf("Informacoes sobre o simbolo '%s':\n", searchKey1);
+        printf("Escopo: 2\n");
+        printf("Localizacao (linha): %d\n", data1->line);
+        printf("Natureza: %d\n", data1->nature);
+        printf("Tipo do dado: %d\n", data1->type);
+        printf("Valor do token: %s\n", data1->value);
+    } else {
+        printf("Simbolo '%s' nao encontrado.\n", searchKey1);
+    }
+
+    const char* searchKey2 = "z";
+    SymbolData* data2 = lookupSymbolWithScope(&tableStack, searchKey2);
+    if (data2 != NULL) {
+        printf("\nInformacoes sobre o simbolo '%s':\n", searchKey2);
+        printf("Escopo: 1\n");
+        printf("Localizacao (linha): %d\n", data2->line);
+        printf("Natureza: %d\n", data2->nature);
+        printf("Tipo do dado: %d\n", data2->type);
+        printf("Valor do token: %s\n", data2->value);
+    } else {
+        printf("Simbolo '%s' nao encontrado.\n", searchKey2);
+    }
+
+    // Desempilhando escopos (liberando memória poderia ser feito no final do compilador)
+    popScope(&tableStack); // Desempilha o segundo escopo
+    popScope(&tableStack); // Desempilha o primeiro escopo
 
     return 0;
 }
