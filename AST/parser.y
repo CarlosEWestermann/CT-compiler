@@ -10,7 +10,7 @@
     int yylex(void);
     void yyerror (char const *mensagem);
     extern void *arvore;
-    extern TableStack tableStack; 
+    extern TableStack *stack; 
 %}
 
 %define parse.error verbose
@@ -63,7 +63,7 @@
 
 
 
-program: /* empty */ { $$ = NULL;  printf("%d",tableStack.top);}
+program: /* empty */ { $$ = NULL;  printf("%d",stack->top);}
     | element program { if($1 != NULL) {
                             $$ = $1; 
                             asd_add_child($$, $2); 
@@ -75,14 +75,14 @@ program: /* empty */ { $$ = NULL;  printf("%d",tableStack.top);}
 element: function { $$ = $1; }
     | global_declaration { $$ = $1; };
 
-global_declaration: type list_vars ';' { $$ = $2; };
+global_declaration: type list_vars ';' { $$ = $2; } ;
 
 type: TK_PR_INT {  }
     | TK_PR_FLOAT {  }
     | TK_PR_BOOL {  };
 
-list_vars: TK_IDENTIFICADOR { $$ = NULL; free($1.token_value);}
-        | list_vars ',' TK_IDENTIFICADOR { $$ = $1; free($3.token_value);};
+list_vars: TK_IDENTIFICADOR { $$ = NULL; free($1.token_value); }
+        | list_vars ',' TK_IDENTIFICADOR { $$ = $1; free($3.token_value); };
 
 function: header body { $$ = $1; asd_add_child($$, $2); };
 

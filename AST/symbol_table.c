@@ -58,12 +58,15 @@ void freeTable(SymbolTable* table) {
 }
 
 // Função para empilhar uma tabela de símbolos na pilha de escopos
-void pushScope(TableStack* stack, SymbolTable* table) {
+SymbolTable* pushScope(TableStack* stack) {
     if (stack->top < MAX_SCOPES - 1) {
+        SymbolTable *table = NULL;
         stack->top++;
         stack->stack[stack->top] = table;
+        return table;
     } else {
         printf("Erro: Pilha de escopos cheia\n");
+        exit(-1);
     }
 }
 
@@ -78,8 +81,8 @@ void popScope(TableStack* stack) {
 
 void insertSymbolWithScope(TableStack* stack, const char* key, int line, SymbolNature nature, SymbolType type, const char* value) {
     if (lookupSymbolWithScope(stack, key) != NULL) {
-        printf("Erro: Identificador '%s' já declarado neste escopo\n", key);
-        return;
+        printf("Erro: Identificador '%s' já declarado \n", key);
+        exit(ERR_DECLARED);
     }
 
     SymbolTable* currentScope = stack->stack[stack->top];
@@ -95,6 +98,17 @@ SymbolData* lookupSymbolWithScope(TableStack* stack, const char* key) {
         }
     }
     return NULL;
+}
+
+void lookUpSymbolWhenUsed(TableStack* stack, const char* key) {
+        for (int i = stack->top; i >= 0; i--) {
+        SymbolTable* currentScope = stack->stack[i];
+        SymbolData* symbol = lookupSymbol(currentScope, key);
+        if (symbol != NULL) {
+            return;
+        }
+    }
+    exit(ERR_UNDECLARED);
 }
 
 

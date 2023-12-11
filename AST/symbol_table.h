@@ -3,11 +3,15 @@
 
 #define MAX_SCOPES 100 // Defina o número máximo de escopos
 
+#define ERR_UNDECLARED 10 //2.2
+#define ERR_DECLARED 11 //2.2
+#define ERR_VARIABLE 20 //2.3
+#define ERR_FUNCTION 21 //2.3
 
 // Definições de enums e estruturas
 
 typedef enum {
-    LITERAL,
+    LITERAL ,
     IDENTIFIER,
     FUNCTION
 } SymbolNature;
@@ -45,7 +49,7 @@ typedef struct {
 void insertSymbol(SymbolTable* table, const char* key, int line, SymbolNature nature, SymbolType type, const char* value);
 SymbolData* lookupSymbol(SymbolTable* table, const char* key);
 void freeTable(SymbolTable* table);
-void pushScope(TableStack* stack, SymbolTable* table);
+SymbolTable* pushScope(TableStack* stack);
 void popScope(TableStack* stack);
 void insertSymbolWithScope(TableStack* stack, const char* key, int line, SymbolNature nature, SymbolType type, const char* value);
 SymbolData* lookupSymbolWithScope(TableStack* stack, const char* key);

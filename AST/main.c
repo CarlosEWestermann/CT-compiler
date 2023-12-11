@@ -10,13 +10,24 @@ extern int yyparse(void);
 extern int yylex_destroy(void);
 
 void *arvore = NULL;
-TableStack tableStack; 
+TableStack *stack;
+SymbolTable *currentScope; 
 
 int main (int argc, char **argv)
 {
-    tableStack.top = -1;
+    stack->top = -1;
+    // emiplhando scope 
+    currentScope = pushScope(stack);
+    insertSymbolWithScope(stack, "SEXO", 1, IDENTIFIER, IDENTIFICADOR, "sexo");
+    currentScope = pushScope(stack);
+    insertSymbolWithScope(stack, "SEXO", 2, IDENTIFIER, BOOL, "true");
+
     int ret = yyparse(); 
     exporta (arvore);
     yylex_destroy();
+    // Liberar a memória associada a cada tabela na stack
+    for (int i = 0; i <= stack->top; ++i) {
+        freeTable(stack->stack[i]);
+    }
     return ret;
 }
