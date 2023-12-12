@@ -145,15 +145,36 @@ SymbolData* lookupSymbolWithScope(TableStack* stack, const char* key) {
     return NULL;
 }
 
-void lookUpSymbolWhenUsed(TableStack* stack, const char* key) {
+SymbolData* lookupSymbolWhenUsed(TableStack* stack, const char* key) {
         for (int i = stack->top; i >= 0; i--) {
         SymbolTable* currentScope = stack->stack[i];
         SymbolData* symbol = lookupSymbol(currentScope, key);
         if (symbol != NULL) {
-            return;
+            return symbol;
         }
     }
     exit(ERR_UNDECLARED);
+}
+
+void updateSymbol(TableStack* stack, const char* key, const char* value) {
+    SymbolData* var = lookupSymbolWithScope(stack, key);
+    if (var == NULL) {
+        printf("Variable %s has not been declared.", key);
+        exit(ERR_UNDECLARED);
+    }
+    strcpy(var->value, value);
+    
+}
+
+int inferType(int type1, int type2) {
+    if(type1 == FLOAT || type2 == FLOAT) {
+        return FLOAT;
+    }
+    if(type1 == INT || type2 == INT) {
+        return INT;
+    }
+    return BOOL;
+
 }
 
 // int main() {

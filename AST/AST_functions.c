@@ -18,7 +18,6 @@ asd_tree_t *asd_new(const char *label)
         ret->label = strdup(label);
         ret->number_of_children = 0;
         ret->children = NULL;
-        ret->type = -1;
     }
     return ret;
 }
@@ -45,7 +44,6 @@ void asd_add_child(asd_tree_t *tree, asd_tree_t *child)
         tree->number_of_children++;
         tree->children = (asd_tree_t **)realloc(tree->children, tree->number_of_children * sizeof(asd_tree_t *));
         tree->children[tree->number_of_children - 1] = child;
-        tree->type=-1;
     }
 
 }

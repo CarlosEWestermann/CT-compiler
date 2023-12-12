@@ -21,6 +21,7 @@ typedef struct {
 typedef struct asd_tree {
     char *label;
     int type;
+    char *value;
     int number_of_children;
     struct asd_tree **children;
     struct asd_tree *next; //next element of function call stack

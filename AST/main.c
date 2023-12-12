@@ -15,7 +15,7 @@ TableStack stack;
 int main (int argc, char **argv)
 {
     stack.top = -1;
-    pushScope(&stack);
+/*     pushScope(&stack);
     insertSymbolWithScope(&stack, "TESTE", 1, IDENTIFIER, FLOAT, "TESTE");
     insertSymbolWithScope(&stack, "TESTE_COMPLETO_2", 1, IDENTIFIER, BOOL, "TESTE");
     popScope(&stack);
@@ -25,9 +25,9 @@ int main (int argc, char **argv)
     print_all(&stack);
     print_all(&stack);
     insertSymbolWithScope(&stack, "TESTE", 1, IDENTIFIER, FLOAT, "TESTE");
-
+ */
     int ret = yyparse(); 
-    print_all(&stack);
+//    print_all(&stack);
     exporta (arvore);
     yylex_destroy();
     // Liberar a memória associada a cada tabela na stack

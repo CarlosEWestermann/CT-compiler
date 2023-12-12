@@ -55,5 +55,8 @@ void popScope(TableStack* stack);
 void insertSymbolWithScope(TableStack* stack, const char* key, int line, SymbolNature nature, SymbolType type, const char* value);
 void insertSymbolGlobal(TableStack* stack, const char* key, int line, SymbolNature nature, SymbolType type, const char* value);
 SymbolData* lookupSymbolWithScope(TableStack* stack, const char* key);
+void updateSymbol(TableStack* stack, const char* key, const char* value);
+SymbolData* lookupSymbolWhenUsed(TableStack* stack, const char* key);
+int inferType(int type1, int type2);
 
 #endif /* SYMBOL_TABLE_H */

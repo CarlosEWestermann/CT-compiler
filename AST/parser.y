@@ -93,8 +93,8 @@ list_vars: TK_IDENTIFICADOR { $$ = NULL; free($1.token_value); }
 
 function: push_scope header body pop_scope { $$ = $2; asd_add_child($$, $3); };
 
-header: '(' param_list ')' TK_OC_GE type '!' TK_IDENTIFICADOR { asd_new($7.token_value); insertSymbolGlobal(&stack, $7.token_value, $7.lineno, FUNCTION, $5, ""); free($7.token_value);}
-        | '(' ')' TK_OC_GE type '!' TK_IDENTIFICADOR { $$ = asd_new($6.token_value); free($6.token_value); };
+header: '(' param_list ')' TK_OC_GE type '!' TK_IDENTIFICADOR { $$ = asd_new($7.token_value); insertSymbolGlobal(&stack, $7.token_value, $7.lineno, FUNCTION, $5, ""); /* $$->type = $5; */  free($7.token_value);}
+        | '(' ')' TK_OC_GE type '!' TK_IDENTIFICADOR { $$ = asd_new($6.token_value); insertSymbolGlobal(&stack, $6.token_value, $6.lineno, FUNCTION, $4, ""); /* $$->type = $4; */ free($6.token_value); };
 
 param_list: param {  }
             | param_list ',' param {  };
@@ -102,7 +102,7 @@ param_list: param {  }
 param: type TK_IDENTIFICADOR { insertSymbolWithScope(&stack, $2.token_value, $2.lineno, IDENTIFIER, $1, ""); free($2.token_value); }; 
 
 body: '{' '}' { $$ = NULL; }
-    | '{' command_list '}' { pushScope(&stack); $$ = $2; popScope(&stack); };
+    | '{' push_scope command_list pop_scope '}' { $$ = $3; };
 
 command_list: command { $$ = $1; }
             | command command_list {if ($1 == NULL){
@@ -129,12 +129,17 @@ command: local_var_dec ';' { $$ = $1; }
         | open_block { $$ = $1; };
 
 open_block: '{''}'';' { $$ = NULL; }
-            | '{' command_list '}'';' { $$ = $2; };
+            | '{' push_scope command_list pop_scope '}'';' { $$ = $3; };
 
 
 local_var_dec: type list_vars { $$ = $2; };
 
-attrib: TK_IDENTIFICADOR '=' expr { $$ = asd_new("="); asd_add_child($$, asd_new($1.token_value)); asd_add_child($$, $3); free($1.token_value);};
+attrib: TK_IDENTIFICADOR '=' expr { $$ = asd_new("="); asd_add_child($$, asd_new($1.token_value)); asd_add_child($$, $3); 
+    SymbolData *var = lookupSymbolWhenUsed(&stack, $1.token_value);
+    $$->type = var->type;
+    //updateSymbol(&stack, $1.token_value, "2"/*$3->value*/);
+    free($1.token_value);
+};
 
 function_call: TK_IDENTIFICADOR '(' arg_list ')' { 
                     char *buffer = malloc((strlen("call ") + strlen($1.token_value) + 1)* sizeof(char));
@@ -170,39 +175,43 @@ while: TK_PR_WHILE '(' expr ')' body { $$ = asd_new("while"); asd_add_child($$, 
 expr: logical_or_expr { $$ = $1; };
 
 logical_or_expr: logical_and_expr { $$ = $1; }
-    | logical_or_expr TK_OC_OR logical_and_expr {$$ = asd_new("|"); asd_add_child($$, $1); asd_add_child($$, $3); };
+    | logical_or_expr TK_OC_OR logical_and_expr {$$ = asd_new("|"); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);};
 
 logical_and_expr: equality_expr { $$ = $1; }
-    | logical_and_expr TK_OC_AND equality_expr { $$ = asd_new("&"); asd_add_child($$, $1); asd_add_child($$, $3); };
+    | logical_and_expr TK_OC_AND equality_expr { $$ = asd_new("&"); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);};
 
 equality_expr: relational_expr { $$ = $1; }
-    | equality_expr TK_OC_EQ relational_expr { $$ = asd_new("=="); asd_add_child($$, $1); asd_add_child($$, $3); }
-    | equality_expr TK_OC_NE relational_expr { $$ = asd_new("!="); asd_add_child($$, $1); asd_add_child($$, $3); };
+    | equality_expr TK_OC_EQ relational_expr { $$ = asd_new("=="); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);}
+    | equality_expr TK_OC_NE relational_expr { $$ = asd_new("!="); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);};
 
 relational_expr: add_sub_expr { $$ = $1; }
-    | relational_expr '<' add_sub_expr { $$ = asd_new("<"); asd_add_child($$, $1); asd_add_child($$, $3); }
-    | relational_expr '>' add_sub_expr { $$ = asd_new(">"); asd_add_child($$, $1); asd_add_child($$, $3); }
-    | relational_expr TK_OC_LE add_sub_expr { $$ = asd_new("<="); asd_add_child($$, $1); asd_add_child($$, $3); }
-    | relational_expr TK_OC_GE add_sub_expr { $$ = asd_new(">="); asd_add_child($$, $1); asd_add_child($$, $3); };
+    | relational_expr '<' add_sub_expr { $$ = asd_new("<"); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);}
+    | relational_expr '>' add_sub_expr { $$ = asd_new(">"); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);}
+    | relational_expr TK_OC_LE add_sub_expr { $$ = asd_new("<="); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);}
+    | relational_expr TK_OC_GE add_sub_expr { $$ = asd_new(">="); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);};
 
 add_sub_expr: mult_div_mod_expr { $$ = $1; }
-    | add_sub_expr '+' mult_div_mod_expr { $$ = asd_new("+"); asd_add_child($$, $1); asd_add_child($$, $3); }
-    | add_sub_expr '-' mult_div_mod_expr { $$ = asd_new("-"); asd_add_child($$, $1); asd_add_child($$, $3); };
+    | add_sub_expr '+' mult_div_mod_expr { $$ = asd_new("+"); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);}
+    | add_sub_expr '-' mult_div_mod_expr { $$ = asd_new("-"); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);};
 
 mult_div_mod_expr: unary_expr { $$ = $1; }
-    | mult_div_mod_expr '*' unary_expr { $$ = asd_new("*"); asd_add_child($$, $1); asd_add_child($$, $3); }
-    | mult_div_mod_expr '/' unary_expr { $$ = asd_new("/"); asd_add_child($$, $1); asd_add_child($$, $3); }
-    | mult_div_mod_expr '%' unary_expr { $$ = asd_new("%"); asd_add_child($$, $1); asd_add_child($$, $3); };
+    | mult_div_mod_expr '*' unary_expr { $$ = asd_new("*"); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);}
+    | mult_div_mod_expr '/' unary_expr { $$ = asd_new("/"); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);}
+    | mult_div_mod_expr '%' unary_expr { $$ = asd_new("%"); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);};
 
 unary_expr: primary_expr { $$ = $1; }
-        | '-' unary_expr %prec UMINUS { $$ = asd_new("-"); asd_add_child($$, $2); }
-        | '!' unary_expr { $$ = asd_new("!"); asd_add_child($$, $2); };
+        | '-' unary_expr %prec UMINUS { $$ = asd_new("-"); asd_add_child($$, $2); $$->type = $2->type; }
+        | '!' unary_expr { $$ = asd_new("!"); asd_add_child($$, $2); $$->type = $2->type; };
 
-primary_expr: TK_IDENTIFICADOR { $$ = asd_new($1.token_value); free($1.token_value); }
-    | TK_LIT_INT { $$ = asd_new($1.token_value); free($1.token_value);}
-    | TK_LIT_FLOAT { $$ = asd_new($1.token_value); free($1.token_value);}
-    | TK_LIT_TRUE { $$ = asd_new($1.token_value); free($1.token_value);}
-    | TK_LIT_FALSE { $$ = asd_new($1.token_value); free($1.token_value);}
+primary_expr: TK_IDENTIFICADOR { $$ = asd_new($1.token_value);     
+        SymbolData *var = lookupSymbolWhenUsed(&stack, $1.token_value);
+        $$->type = var->type; 
+        free($1.token_value); 
+        }
+    | TK_LIT_INT { $$ = asd_new($1.token_value); free($1.token_value); $$->type = INT; }
+    | TK_LIT_FLOAT { $$ = asd_new($1.token_value); free($1.token_value); $$->type = FLOAT; }
+    | TK_LIT_TRUE { $$ = asd_new($1.token_value); free($1.token_value); $$->type = BOOL; }
+    | TK_LIT_FALSE { $$ = asd_new($1.token_value); free($1.token_value); $$->type = BOOL; }
     | function_call { $$ = $1; }
     | '(' expr ')' { $$ = $2; };
 
