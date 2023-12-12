@@ -4,6 +4,7 @@
 /*Théo Santiago Müller 00301593*/
 
 %{
+#include "symbol_table.h"
 #include "parser.tab.h"
 %}
 

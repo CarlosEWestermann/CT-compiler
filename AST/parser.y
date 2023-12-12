@@ -20,6 +20,7 @@
 %union {
     lexical_value_t lexical_value;
     asd_tree_t *tree;
+    SymbolType type;
 }
 
 %token <lexical_value> TK_PR_INT TK_PR_FLOAT TK_PR_BOOL TK_PR_IF TK_PR_ELSE TK_PR_WHILE TK_PR_RETURN
@@ -30,7 +31,7 @@
 %type <tree> program
 %type <tree> element
 %type <tree> global_declaration
-%type <tree> type
+%type <type> type
 %type <tree> list_vars
 %type <tree> function
 %type <tree> header
@@ -83,23 +84,22 @@ element: function { $$ = $1; }
 
 global_declaration: type list_vars ';' { $$ = $2; };
 
-type: TK_PR_INT { //printf("token type: %d\n", $1.token_type); $$->type = (int*)malloc(sizeof(int)); $$->type = $1.token_type; 
-}
-    | TK_PR_FLOAT { }
-    | TK_PR_BOOL { };
+type: TK_PR_INT { $$ = INT; }
+    | TK_PR_FLOAT { $$ = FLOAT; }
+    | TK_PR_BOOL { $$ = BOOL; };
 
 list_vars: TK_IDENTIFICADOR { $$ = NULL; free($1.token_value); }
         | list_vars ',' TK_IDENTIFICADOR { $$ = $1; free($3.token_value); };
 
 function: push_scope header body pop_scope { $$ = $2; asd_add_child($$, $3); };
 
-header: '(' param_list ')' TK_OC_GE type '!' TK_IDENTIFICADOR { asd_new($7.token_value); insertSymbolGlobal(&stack, $7.token_value, $7.lineno, FUNCTION, 259, ""); free($7.token_value);}
+header: '(' param_list ')' TK_OC_GE type '!' TK_IDENTIFICADOR { asd_new($7.token_value); insertSymbolGlobal(&stack, $7.token_value, $7.lineno, FUNCTION, $5, ""); free($7.token_value);}
         | '(' ')' TK_OC_GE type '!' TK_IDENTIFICADOR { $$ = asd_new($6.token_value); free($6.token_value); };
 
 param_list: param {  }
             | param_list ',' param {  };
 
-param: type TK_IDENTIFICADOR { insertSymbolWithScope(&stack, $2.token_value, $2.lineno, IDENTIFIER, /*$1->type*/ 259, ""); free($2.token_value); }; 
+param: type TK_IDENTIFICADOR { insertSymbolWithScope(&stack, $2.token_value, $2.lineno, IDENTIFIER, $1, ""); free($2.token_value); }; 
 
 body: '{' '}' { $$ = NULL; }
     | '{' command_list '}' { pushScope(&stack); $$ = $2; popScope(&stack); };
@@ -153,6 +153,7 @@ function_call: TK_IDENTIFICADOR '(' arg_list ')' {
                         free(buffer);
                         free($1.token_value);
                     };
+
 
 arg_list: arg { $$ = $1; }
     | arg ',' arg_list { $$ = $1; asd_add_child($$, $3); };
