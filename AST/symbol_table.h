@@ -45,11 +45,13 @@ typedef struct {
     int top;
 } TableStack;
 
+void print_all(TableStack* stack);
+
 // Assinaturas das funções
 void insertSymbol(SymbolTable* table, const char* key, int line, SymbolNature nature, SymbolType type, const char* value);
 SymbolData* lookupSymbol(SymbolTable* table, const char* key);
 void freeTable(SymbolTable* table);
-SymbolTable* pushScope(TableStack* stack);
+void pushScope(TableStack* stack);
 void popScope(TableStack* stack);
 void insertSymbolWithScope(TableStack* stack, const char* key, int line, SymbolNature nature, SymbolType type, const char* value);
 SymbolData* lookupSymbolWithScope(TableStack* stack, const char* key);

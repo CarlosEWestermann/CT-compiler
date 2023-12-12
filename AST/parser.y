@@ -10,7 +10,7 @@
     int yylex(void);
     void yyerror (char const *mensagem);
     extern void *arvore;
-    extern TableStack *stack; 
+    extern TableStack stack; 
 %}
 
 %define parse.error verbose
@@ -63,7 +63,7 @@
 
 
 
-program: /* empty */ { $$ = NULL;  printf("%d",stack->top);}
+program: /* empty */ { $$ = NULL; }
     | element program { if($1 != NULL) {
                             $$ = $1; 
                             asd_add_child($$, $2); 
@@ -75,7 +75,7 @@ program: /* empty */ { $$ = NULL;  printf("%d",stack->top);}
 element: function { $$ = $1; }
     | global_declaration { $$ = $1; };
 
-global_declaration: type list_vars ';' { $$ = $2; } ;
+global_declaration: type list_vars ';' { $$ = $2; };
 
 type: TK_PR_INT {  }
     | TK_PR_FLOAT {  }
@@ -108,14 +108,8 @@ command_list: command { $$ = $1; }
                     while ($$->next!=NULL) {
                         $$ = $$->next;
                     }
-                    // percorre lista de comandos chamados
-                    // quando não tem outro comando encadeado
-                    // só adiciona o próximo como filho
                     asd_add_child($$, $2);
-                    // aponta como próximo o segundo comando da produção
                     $$->next=$2;
-                    // retorna ao começo da lista de comandos
-                    // pra não perder a referência do bloco da função principal
                     $$ = $1;
                 };}
 

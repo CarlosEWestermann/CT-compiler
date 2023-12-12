@@ -8,6 +8,8 @@
 void insertSymbol(SymbolTable* table, const char* key, int line, SymbolNature nature, SymbolType type, const char* value) {
     // Calcular índice na table hash (pode usar uma função de hash mais sofisticada)
     int i = strlen(key) % 100;
+    printf("inseri isso aqui: '%s' \n", key);
+
 
     // Criar uma nova entrada para o símbolo
     TableEntry* newEntry = (TableEntry*)malloc(sizeof(TableEntry));
@@ -29,6 +31,36 @@ void insertSymbol(SymbolTable* table, const char* key, int line, SymbolNature na
         curr->next = newEntry;
     }
 }
+
+void print_all(TableStack* stack) {
+    if (stack->top == -1) {
+        printf("Stack is empty.\n");
+        return;
+    }
+
+    printf("top: %d\n", stack->top);
+
+    for (int i = stack->top; i >= 0; i--) {
+        SymbolTable* currentScope = stack->stack[i];
+        if (currentScope == NULL) {
+            continue; // Skip if current scope is NULL
+        }
+
+        for (int j = 0; j < 100; j++) {
+            TableEntry* table = currentScope->table[j];
+            while (table != NULL) { 
+                printf("Key: %s, Line: %d, Nature: %d, Type: %d, Value: %s\n",
+                    table->key,
+                    table->content.line,
+                    table->content.nature,
+                    table->content.type,
+                    table->content.value);
+                table = table->next;
+            }
+        }
+    }
+}
+
 
 // Função para buscar um símbolo na table de símbolos
 SymbolData* lookupSymbol(SymbolTable* table, const char* key) {
@@ -57,13 +89,16 @@ void freeTable(SymbolTable* table) {
     }
 }
 
-// Função para empilhar uma tabela de símbolos na pilha de escopos
-SymbolTable* pushScope(TableStack* stack) {
+void pushScope(TableStack* stack) {
     if (stack->top < MAX_SCOPES - 1) {
-        SymbolTable *table = NULL;
+        SymbolTable* newTable = malloc(sizeof(SymbolTable));
+        if (newTable == NULL) {
+            printf("Error: Memory allocation failed\n");
+            exit(-1);
+        }
+
         stack->top++;
-        stack->stack[stack->top] = table;
-        return table;
+        stack->stack[stack->top] = newTable;
     } else {
         printf("Erro: Pilha de escopos cheia\n");
         exit(-1);
@@ -91,11 +126,13 @@ void insertSymbolWithScope(TableStack* stack, const char* key, int line, SymbolN
 
 SymbolData* lookupSymbolWithScope(TableStack* stack, const char* key) {
     for (int i = stack->top; i >= 0; i--) {
+
         SymbolTable* currentScope = stack->stack[i];
         SymbolData* symbol = lookupSymbol(currentScope, key);
         if (symbol != NULL) {
             return symbol;
         }
+        //printf("to procurando isso aqui: '%s' no scope: %d\n", key, i);
     }
     return NULL;
 }
