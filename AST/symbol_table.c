@@ -119,10 +119,11 @@ void insertSymbolWithScope(TableStack* stack, const char* key, int line, SymbolN
     printf("inserting symbol in scope number: %d\n", stack->top);
     SymbolTable* currentScope = stack->stack[stack->top];
     insertSymbol(currentScope, key, line, nature, type, value);
+
 }
 
 void insertSymbolGlobal(TableStack* stack, const char* key, int line, SymbolNature nature, SymbolType type, const char* value) {
-        if (lookupSymbol(stack->stack[0], key) != NULL) {
+        if (lookupSymbolWithScope(stack, key) != NULL) {
         printf("Erro: Identificador '%s' já declarado \n", key);
         exit(ERR_DECLARED);
     }
