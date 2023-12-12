@@ -17,10 +17,9 @@ typedef enum {
 } SymbolNature;
 
 typedef enum {
-    INT,
-    FLOAT,
-    IDENTIFICADOR,
-    BOOL
+    INT = 259,
+    FLOAT = 260,
+    BOOL = 261
 } SymbolType;
 
 typedef struct {
@@ -54,6 +53,7 @@ void freeTable(SymbolTable* table);
 void pushScope(TableStack* stack);
 void popScope(TableStack* stack);
 void insertSymbolWithScope(TableStack* stack, const char* key, int line, SymbolNature nature, SymbolType type, const char* value);
+void insertSymbolGlobal(TableStack* stack, const char* key, int line, SymbolNature nature, SymbolType type, const char* value);
 SymbolData* lookupSymbolWithScope(TableStack* stack, const char* key);
 
 #endif /* SYMBOL_TABLE_H */

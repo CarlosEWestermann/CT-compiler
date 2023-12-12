@@ -18,9 +18,21 @@
 [ \t] {}
 \n {}
 
-int return TK_PR_INT;
-float return TK_PR_FLOAT;
-bool return TK_PR_BOOL;
+int {
+    yylval.lexical_value.lineno = yylineno;
+    yylval.lexical_value.token_type = TK_PR_INT;
+    return TK_PR_INT;
+};
+float {
+    yylval.lexical_value.lineno = yylineno;
+    yylval.lexical_value.token_type = TK_PR_FLOAT;
+    return TK_PR_FLOAT;
+};
+bool {
+    yylval.lexical_value.lineno = yylineno;
+    yylval.lexical_value.token_type = TK_PR_BOOL;
+    return TK_PR_BOOL;
+};
 if return TK_PR_IF;
 else return TK_PR_ELSE;
 while return TK_PR_WHILE;

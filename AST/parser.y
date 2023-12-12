@@ -22,7 +22,7 @@
     asd_tree_t *tree;
 }
 
-%token TK_PR_INT TK_PR_FLOAT TK_PR_BOOL TK_PR_IF TK_PR_ELSE TK_PR_WHILE TK_PR_RETURN
+%token <lexical_value> TK_PR_INT TK_PR_FLOAT TK_PR_BOOL TK_PR_IF TK_PR_ELSE TK_PR_WHILE TK_PR_RETURN
 %token TK_OC_LE TK_OC_GE TK_OC_EQ TK_OC_NE TK_OC_AND TK_OC_OR
 %token <lexical_value> TK_IDENTIFICADOR TK_LIT_INT TK_LIT_FLOAT TK_LIT_FALSE TK_LIT_TRUE 
 %token TK_ERRO
@@ -34,7 +34,6 @@
 %type <tree> list_vars
 %type <tree> function
 %type <tree> header
-%type <tree> function_name
 %type <tree> param_list
 %type <tree> param
 %type <tree> body
@@ -64,40 +63,46 @@
 
 
 program: /* empty */ { $$ = NULL; }
-    | element program { if($1 != NULL) {
-                            $$ = $1; 
-                            asd_add_child($$, $2); 
+    | push_scope element program pop_scope {
+                        if($2 != NULL) {
+                            $$ = $2; 
+                            asd_add_child($$, $3); 
                         } else {
-                            $$ = $2;
+                            $$ = $3;
                         } 
-                        arvore = $$; };
+
+                        arvore = $$;
+                        };
+
+push_scope: { pushScope(&stack); };
+
+pop_scope: { popScope(&stack); };
 
 element: function { $$ = $1; }
     | global_declaration { $$ = $1; };
 
 global_declaration: type list_vars ';' { $$ = $2; };
 
-type: TK_PR_INT {  }
-    | TK_PR_FLOAT {  }
-    | TK_PR_BOOL {  };
+type: TK_PR_INT { //printf("token type: %d\n", $1.token_type); $$->type = (int*)malloc(sizeof(int)); $$->type = $1.token_type; 
+}
+    | TK_PR_FLOAT { }
+    | TK_PR_BOOL { };
 
 list_vars: TK_IDENTIFICADOR { $$ = NULL; free($1.token_value); }
         | list_vars ',' TK_IDENTIFICADOR { $$ = $1; free($3.token_value); };
 
-function: header body { $$ = $1; asd_add_child($$, $2); };
+function: push_scope header body pop_scope { $$ = $2; asd_add_child($$, $3); };
 
-header: '(' param_list ')' TK_OC_GE type '!' function_name { $$ = $7; }
+header: '(' param_list ')' TK_OC_GE type '!' TK_IDENTIFICADOR { asd_new($7.token_value); insertSymbolGlobal(&stack, $7.token_value, $7.lineno, FUNCTION, 259, ""); free($7.token_value);}
         | '(' ')' TK_OC_GE type '!' TK_IDENTIFICADOR { $$ = asd_new($6.token_value); free($6.token_value); };
-
-function_name: TK_IDENTIFICADOR { $$ = asd_new($1.token_value); free($1.token_value); };
 
 param_list: param {  }
             | param_list ',' param {  };
 
-param: type TK_IDENTIFICADOR { free($2.token_value); }; 
+param: type TK_IDENTIFICADOR { insertSymbolWithScope(&stack, $2.token_value, $2.lineno, IDENTIFIER, /*$1->type*/ 259, ""); free($2.token_value); }; 
 
 body: '{' '}' { $$ = NULL; }
-    | '{' command_list '}' { $$ = $2; };
+    | '{' command_list '}' { pushScope(&stack); $$ = $2; popScope(&stack); };
 
 command_list: command { $$ = $1; }
             | command command_list {if ($1 == NULL){

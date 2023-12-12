@@ -4,14 +4,11 @@
 
 #include "symbol_table.h"
 
-// Função para inserir um símbolo na table de símbolos
 void insertSymbol(SymbolTable* table, const char* key, int line, SymbolNature nature, SymbolType type, const char* value) {
-    // Calcular índice na table hash (pode usar uma função de hash mais sofisticada)
     int i = strlen(key) % 100;
-    printf("inseri isso aqui: '%s' \n", key);
+    printf("Inserting Symbol:  key{%s} line{%d} nature{%d} type {%d} value {%s} \n", key, line, nature, type, value);
 
 
-    // Criar uma nova entrada para o símbolo
     TableEntry* newEntry = (TableEntry*)malloc(sizeof(TableEntry));
     strcpy(newEntry->key, key);
     newEntry->content.line = line;
@@ -20,7 +17,8 @@ void insertSymbol(SymbolTable* table, const char* key, int line, SymbolNature na
     strcpy(newEntry->content.value, value);
     newEntry->next = NULL;
 
-    // Inserir a entrada na table (tratando colisões por encadeamento)
+    // Temos handling pra conflitos de chave igual
+    // Precisa? Ou queremos barrar SEMPRE?
     if (table->table[i] == NULL) {
         table->table[i] = newEntry;
     } else {
@@ -62,7 +60,6 @@ void print_all(TableStack* stack) {
 }
 
 
-// Função para buscar um símbolo na table de símbolos
 SymbolData* lookupSymbol(SymbolTable* table, const char* key) {
     int i = strlen(key) % 100;
 
@@ -77,7 +74,6 @@ SymbolData* lookupSymbol(SymbolTable* table, const char* key) {
     return NULL;
 }
 
-// Função para liberar a memória alocada para a table de símbolos
 void freeTable(SymbolTable* table) {
     for (int i = 0; i < 100; ++i) {
         TableEntry* curr = table->table[i];
@@ -111,6 +107,7 @@ void popScope(TableStack* stack) {
         stack->top--;
     } else {
         printf("Erro: Pilha de escopos vazia\n");
+        exit(-1);
     }
 }
 
@@ -119,9 +116,19 @@ void insertSymbolWithScope(TableStack* stack, const char* key, int line, SymbolN
         printf("Erro: Identificador '%s' já declarado \n", key);
         exit(ERR_DECLARED);
     }
-
+    printf("inserting symbol in scope number: %d\n", stack->top);
     SymbolTable* currentScope = stack->stack[stack->top];
     insertSymbol(currentScope, key, line, nature, type, value);
+}
+
+void insertSymbolGlobal(TableStack* stack, const char* key, int line, SymbolNature nature, SymbolType type, const char* value) {
+        if (lookupSymbol(stack->stack[0], key) != NULL) {
+        printf("Erro: Identificador '%s' já declarado \n", key);
+        exit(ERR_DECLARED);
+    }
+    printf("inserting symbol in scope number: 0\n");
+    SymbolTable* globalScope = stack->stack[0];
+    insertSymbol(globalScope, key, line, nature, type, value);
 }
 
 SymbolData* lookupSymbolWithScope(TableStack* stack, const char* key) {
@@ -147,7 +154,6 @@ void lookUpSymbolWhenUsed(TableStack* stack, const char* key) {
     }
     exit(ERR_UNDECLARED);
 }
-
 
 // int main() {
 //     TableStack tableStack;
