@@ -11,6 +11,7 @@
     void yyerror (char const *mensagem);
     extern void *arvore;
     extern TableStack stack; 
+    char *varList[100];
 %}
 
 %define parse.error verbose
@@ -148,6 +149,8 @@ function_call: TK_IDENTIFICADOR '(' arg_list ')' {
                     $$ = asd_new(buffer);
                     asd_add_child($$, $3);
                     free(buffer);
+                    SymbolData *var = lookupSymbolWhenUsed(&stack, $1.token_value);
+                    $$->type = var->type; 
                     free($1.token_value);
                     }
                 | TK_IDENTIFICADOR '(' ')' { 
@@ -156,6 +159,8 @@ function_call: TK_IDENTIFICADOR '(' arg_list ')' {
                         strcat(buffer, $1.token_value);
                         $$ = asd_new(buffer);
                         free(buffer);
+                        SymbolData *var = lookupSymbolWhenUsed(&stack, $1.token_value);
+                        $$->type = var->type; 
                         free($1.token_value);
                     };
 
@@ -165,12 +170,12 @@ arg_list: arg { $$ = $1; }
 
 arg: expr { $$ = $1; };
 
-return: TK_PR_RETURN expr { $$ = asd_new("return"); asd_add_child($$, $2); };
+return: TK_PR_RETURN expr { $$ = asd_new("return"); asd_add_child($$, $2); $$->type = $2->type; };
 
-conditional: TK_PR_IF '(' expr ')' body { $$ = asd_new("if"); asd_add_child($$, $3); asd_add_child($$, $5); }
-            | TK_PR_IF '(' expr ')' body TK_PR_ELSE body  { $$ = asd_new("if"); asd_add_child($$, $3); asd_add_child($$, $5); asd_add_child($$, $7);}
+conditional: TK_PR_IF '(' expr ')' body { $$ = asd_new("if"); asd_add_child($$, $3); asd_add_child($$, $5); $$->type = $3->type; }
+            | TK_PR_IF '(' expr ')' body TK_PR_ELSE body  { $$ = asd_new("if"); asd_add_child($$, $3); asd_add_child($$, $5); asd_add_child($$, $7); $$->type = $3->type; }
 
-while: TK_PR_WHILE '(' expr ')' body { $$ = asd_new("while"); asd_add_child($$, $3); asd_add_child($$, $5); }
+while: TK_PR_WHILE '(' expr ')' body { $$ = asd_new("while"); asd_add_child($$, $3); asd_add_child($$, $5); $$->type = $3->type;}
 
 expr: logical_or_expr { $$ = $1; };
 
