@@ -30,7 +30,7 @@ typedef struct {
 } SymbolData;
 
 typedef struct TableEntry {
-    char key[50];
+    char* key;
     SymbolData content;
     struct TableEntry* next;
 } TableEntry;

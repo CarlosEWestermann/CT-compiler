@@ -1,7 +1,7 @@
 CC = gcc
 BISON = bison
 FLEX = flex
-CFLAGS = -Wall -Wno-unused-function #-fsanitize=address
+CFLAGS = -Wall -Wno-unused-function # -fsanitize=address
 
 OBJECTS = main.o scanner_functions.o AST_functions.o parser.tab.o lex.yy.o symbol_table.o
 EXECUTABLE = etapa4

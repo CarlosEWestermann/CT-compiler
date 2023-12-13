@@ -3,7 +3,8 @@
 /*Carlos Eduardo Westermann - 00327212*/
 /*Théo Santiago Müller 00301593*/
 
-%code top { #include "symbol_table.h" }
+%code top { #include "symbol_table.h"
+            #include <stdlib.h> }
 
 %code requires { #include "AST_functions.h" }
 %{
@@ -11,7 +12,7 @@
     void yyerror (char const *mensagem);
     extern void *arvore;
     extern TableStack stack; 
-    char *varList[100];
+    char *varList[100] = {NULL};
 %}
 
 %define parse.error verbose
@@ -30,6 +31,7 @@
 %token TK_ERRO
 
 %type <tree> program
+%type <tree> init
 %type <tree> element
 %type <tree> global_declaration
 %type <type> type
@@ -62,15 +64,17 @@
 
 %%
 
+program: push_scope init pop_scope {
+    $$ = $2;
+}
 
-
-program: /* empty */ { $$ = NULL; }
-    | push_scope element program pop_scope {
-                        if($2 != NULL) {
-                            $$ = $2; 
-                            asd_add_child($$, $3); 
+init: /* empty */ { $$ = NULL; }
+    | element init  {
+                        if($1 != NULL) {
+                            $$ = $1; 
+                            asd_add_child($$, $2); 
                         } else {
-                            $$ = $3;
+                            $$ = $2;
                         } 
 
                         arvore = $$;
@@ -83,14 +87,53 @@ pop_scope: { popScope(&stack); };
 element: function { $$ = $1; }
     | global_declaration { $$ = $1; };
 
-global_declaration: type list_vars ';' { $$ = $2; };
+global_declaration: type list_vars ';' { 
+    $$ = $2; 
+    int i = 0;
+    while(varList[i] != NULL && i < 100){
+        insertSymbolWithScope(&stack, varList[i], 1, IDENTIFIER, $1, "");
+        i++;
+    }
+    for(i = 0; i < 100; i++){
+        if(varList[i] != NULL){
+            free(varList[i]);
+            varList[i] = NULL;
+        }
+    }
+};
+
 
 type: TK_PR_INT { $$ = INT; }
     | TK_PR_FLOAT { $$ = FLOAT; }
     | TK_PR_BOOL { $$ = BOOL; };
 
-list_vars: TK_IDENTIFICADOR { $$ = NULL; free($1.token_value); }
-        | list_vars ',' TK_IDENTIFICADOR { $$ = $1; free($3.token_value); };
+list_vars: TK_IDENTIFICADOR {   $$ = NULL; 
+                                int i = 0;
+                                while(varList[i] != NULL){
+                                    i++;
+                                    if(i == 100){
+                                        printf("too many variables declared!");
+                                        exit(-1);
+                                    }
+                                }
+                                varList[i] = malloc(strlen($1.token_value) + 1);
+                                strncpy(varList[i], $1.token_value, strlen($1.token_value));
+                                varList[i][strlen($1.token_value)] = '\0';
+                                free($1.token_value);
+                                }
+        | list_vars ',' TK_IDENTIFICADOR { $$ = $1; 
+                                            int i = 0;
+                                            while(varList[i] != NULL){
+                                                i++;
+                                                if(i == 100){
+                                                    printf("too many variables declared!");
+                                                    exit(-1);
+                                                }
+                                            }
+                                            varList[i] = malloc(strlen($3.token_value) + 1);
+                                            strncpy(varList[i], $3.token_value, strlen($3.token_value));
+                                            varList[i][strlen($3.token_value)] = '\0';
+                                            free($3.token_value); };
 
 function: push_scope header body pop_scope { $$ = $2; asd_add_child($$, $3); };
 
@@ -133,10 +176,26 @@ open_block: '{''}'';' { $$ = NULL; }
             | '{' push_scope command_list pop_scope '}'';' { $$ = $3; };
 
 
-local_var_dec: type list_vars { $$ = $2; };
+local_var_dec: type list_vars { 
+    $$ = $2; 
+    int i = 0;
+    while(varList[i] != NULL && i < 100){
+        insertSymbolWithScope(&stack, varList[i], 1, IDENTIFIER, $1, "");
+        i++;
+    }
+    for(i = 0; i < 100; i++){
+        if(varList[i] != NULL){
+            free(varList[i]);
+            varList[i] = NULL;
+        }
+    } };
 
 attrib: TK_IDENTIFICADOR '=' expr { $$ = asd_new("="); asd_add_child($$, asd_new($1.token_value)); asd_add_child($$, $3); 
     SymbolData *var = lookupSymbolWhenUsed(&stack, $1.token_value);
+    if(var->nature == FUNCTION){
+            printf("invalid expression! using non-identifier");
+            exit(ERR_FUNCTION);
+        }
     $$->type = var->type;
     //updateSymbol(&stack, $1.token_value, "2"/*$3->value*/);
     free($1.token_value);
@@ -150,6 +209,10 @@ function_call: TK_IDENTIFICADOR '(' arg_list ')' {
                     asd_add_child($$, $3);
                     free(buffer);
                     SymbolData *var = lookupSymbolWhenUsed(&stack, $1.token_value);
+                    if(var->nature == IDENTIFIER){
+                        printf("invalid function call");
+                        exit(ERR_VARIABLE);
+                        }
                     $$->type = var->type; 
                     free($1.token_value);
                     }
@@ -160,6 +223,10 @@ function_call: TK_IDENTIFICADOR '(' arg_list ')' {
                         $$ = asd_new(buffer);
                         free(buffer);
                         SymbolData *var = lookupSymbolWhenUsed(&stack, $1.token_value);
+                        if(var->nature == IDENTIFIER){
+                        printf("invalid function call");
+                        exit(ERR_VARIABLE);
+                        }
                         $$->type = var->type; 
                         free($1.token_value);
                     };
@@ -210,6 +277,10 @@ unary_expr: primary_expr { $$ = $1; }
 
 primary_expr: TK_IDENTIFICADOR { $$ = asd_new($1.token_value);     
         SymbolData *var = lookupSymbolWhenUsed(&stack, $1.token_value);
+        if(var->nature == FUNCTION){
+            printf("invalid expression! using non-identifier");
+            exit(ERR_FUNCTION);
+        }
         $$->type = var->type; 
         free($1.token_value); 
         }
