@@ -11,7 +11,6 @@
 #include <stdio.h>
 #define ARQUIVO_SAIDA "saida.dot"
 
-
 typedef struct {
         int lineno;
         int token_type;
@@ -24,17 +23,13 @@ typedef struct asd_tree {
     char *value;
     int number_of_children;
     struct asd_tree **children;
-    struct asd_tree *next; //next element of function call stack
+    struct asd_tree *next; 
 } asd_tree_t;
 
 asd_tree_t *asd_new(const char *label);
-
 void asd_free(asd_tree_t *tree);
-
 void asd_add_child(asd_tree_t *tree, asd_tree_t *child);
-
 void _exporta(asd_tree_t* node);
-
 void exporta(void *arvore);
 
 #endif

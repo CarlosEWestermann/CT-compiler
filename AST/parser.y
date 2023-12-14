@@ -13,6 +13,7 @@
     extern void *arvore;
     extern TableStack stack; 
     char *varList[100] = {NULL};
+    int lineList[100] = {-1};
 %}
 
 %define parse.error verbose
@@ -40,7 +41,7 @@
 %type <tree> header
 %type <tree> param_list
 %type <tree> param
-%type <tree> body
+%type <tree> no_scope_body
 %type <tree> command_list
 %type <tree> command
 %type <tree> local_var_dec
@@ -91,17 +92,17 @@ global_declaration: type list_vars ';' {
     $$ = $2; 
     int i = 0;
     while(varList[i] != NULL && i < 100){
-        insertSymbolWithScope(&stack, varList[i], 1, IDENTIFIER, $1, "");
+        insertSymbolWithScope(&stack, varList[i], lineList[i], IDENTIFIER, $1, "");
         i++;
     }
     for(i = 0; i < 100; i++){
         if(varList[i] != NULL){
             free(varList[i]);
+            lineList[i] = -1;
             varList[i] = NULL;
         }
     }
 };
-
 
 type: TK_PR_INT { $$ = INT; }
     | TK_PR_FLOAT { $$ = FLOAT; }
@@ -119,6 +120,7 @@ list_vars: TK_IDENTIFICADOR {   $$ = NULL;
                                 varList[i] = malloc(strlen($1.token_value) + 1);
                                 strncpy(varList[i], $1.token_value, strlen($1.token_value));
                                 varList[i][strlen($1.token_value)] = '\0';
+                                lineList[i] = $1.lineno;
                                 free($1.token_value);
                                 }
         | list_vars ',' TK_IDENTIFICADOR { $$ = $1; 
@@ -133,9 +135,10 @@ list_vars: TK_IDENTIFICADOR {   $$ = NULL;
                                             varList[i] = malloc(strlen($3.token_value) + 1);
                                             strncpy(varList[i], $3.token_value, strlen($3.token_value));
                                             varList[i][strlen($3.token_value)] = '\0';
+                                            lineList[i] = $3.lineno;
                                             free($3.token_value); };
 
-function: push_scope header body pop_scope { $$ = $2; asd_add_child($$, $3); };
+function: push_scope header no_scope_body pop_scope { $$ = $2; asd_add_child($$, $3); };
 
 header: '(' param_list ')' TK_OC_GE type '!' TK_IDENTIFICADOR { $$ = asd_new($7.token_value); insertSymbolGlobal(&stack, $7.token_value, $7.lineno, FUNCTION, $5, ""); /* $$->type = $5; */  free($7.token_value);}
         | '(' ')' TK_OC_GE type '!' TK_IDENTIFICADOR { $$ = asd_new($6.token_value); insertSymbolGlobal(&stack, $6.token_value, $6.lineno, FUNCTION, $4, ""); /* $$->type = $4; */ free($6.token_value); };
@@ -145,8 +148,8 @@ param_list: param {  }
 
 param: type TK_IDENTIFICADOR { insertSymbolWithScope(&stack, $2.token_value, $2.lineno, IDENTIFIER, $1, ""); free($2.token_value); }; 
 
-body: '{' '}' { $$ = NULL; }
-    | '{' push_scope command_list pop_scope '}' { $$ = $3; };
+no_scope_body: '{' '}' { $$ = NULL; }
+    | '{'  command_list  '}' { $$ = $2; };
 
 command_list: command { $$ = $1; }
             | command command_list {if ($1 == NULL){
@@ -180,24 +183,24 @@ local_var_dec: type list_vars {
     $$ = $2; 
     int i = 0;
     while(varList[i] != NULL && i < 100){
-        insertSymbolWithScope(&stack, varList[i], 1, IDENTIFIER, $1, "");
+        insertSymbolWithScope(&stack, varList[i], lineList[i], IDENTIFIER, $1, "");
         i++;
     }
     for(i = 0; i < 100; i++){
         if(varList[i] != NULL){
             free(varList[i]);
             varList[i] = NULL;
+            lineList[i] = -1;
         }
     } };
 
 attrib: TK_IDENTIFICADOR '=' expr { $$ = asd_new("="); asd_add_child($$, asd_new($1.token_value)); asd_add_child($$, $3); 
-    SymbolData *var = lookupSymbolWhenUsed(&stack, $1.token_value);
+    SymbolData *var = lookupSymbolWhenUsed(&stack, $1.token_value, $1.lineno, IDENTIFIER, $1.token_type, "");
     if(var->nature == FUNCTION){
-            printf("invalid expression! using non-identifier");
+            printf("Error: invalid expression! using %s of nature FUNCAO in line %d in left side of expression. Function originally declared in line %d\n", $1.token_value, $1.lineno, var->line);
             exit(ERR_FUNCTION);
         }
     $$->type = var->type;
-    //updateSymbol(&stack, $1.token_value, "2"/*$3->value*/);
     free($1.token_value);
 };
 
@@ -208,9 +211,9 @@ function_call: TK_IDENTIFICADOR '(' arg_list ')' {
                     $$ = asd_new(buffer);
                     asd_add_child($$, $3);
                     free(buffer);
-                    SymbolData *var = lookupSymbolWhenUsed(&stack, $1.token_value);
+                    SymbolData *var = lookupSymbolWhenUsed(&stack, $1.token_value, $1.lineno, FUNCTION, $1.token_type, "");
                     if(var->nature == IDENTIFIER){
-                        printf("invalid function call");
+                        printf("Error: invalid function call %s() in line %d. Identifier was originally declared in line %d\n", $1.token_value, $1.lineno, var->line);
                         exit(ERR_VARIABLE);
                         }
                     $$->type = var->type; 
@@ -222,9 +225,9 @@ function_call: TK_IDENTIFICADOR '(' arg_list ')' {
                         strcat(buffer, $1.token_value);
                         $$ = asd_new(buffer);
                         free(buffer);
-                        SymbolData *var = lookupSymbolWhenUsed(&stack, $1.token_value);
+                        SymbolData *var = lookupSymbolWhenUsed(&stack, $1.token_value, $1.lineno, FUNCTION, $1.token_type, "");
                         if(var->nature == IDENTIFIER){
-                        printf("invalid function call");
+                        printf("Error: invalid function call %s() in line %d. Identifier was originally declared in line %d\n", $1.token_value, $1.lineno, var->line);
                         exit(ERR_VARIABLE);
                         }
                         $$->type = var->type; 
@@ -239,10 +242,10 @@ arg: expr { $$ = $1; };
 
 return: TK_PR_RETURN expr { $$ = asd_new("return"); asd_add_child($$, $2); $$->type = $2->type; };
 
-conditional: TK_PR_IF '(' expr ')' body { $$ = asd_new("if"); asd_add_child($$, $3); asd_add_child($$, $5); $$->type = $3->type; }
-            | TK_PR_IF '(' expr ')' body TK_PR_ELSE body  { $$ = asd_new("if"); asd_add_child($$, $3); asd_add_child($$, $5); asd_add_child($$, $7); $$->type = $3->type; }
+conditional: TK_PR_IF '(' expr ')' no_scope_body { $$ = asd_new("if"); asd_add_child($$, $3); asd_add_child($$, $5); $$->type = $3->type; }
+            | TK_PR_IF '(' expr ')' no_scope_body TK_PR_ELSE no_scope_body  { $$ = asd_new("if"); asd_add_child($$, $3); asd_add_child($$, $5); asd_add_child($$, $7); $$->type = $3->type; }
 
-while: TK_PR_WHILE '(' expr ')' body { $$ = asd_new("while"); asd_add_child($$, $3); asd_add_child($$, $5); $$->type = $3->type;}
+while: TK_PR_WHILE '(' expr ')' no_scope_body { $$ = asd_new("while"); asd_add_child($$, $3); asd_add_child($$, $5); $$->type = $3->type;}
 
 expr: logical_or_expr { $$ = $1; };
 
@@ -276,9 +279,9 @@ unary_expr: primary_expr { $$ = $1; }
         | '!' unary_expr { $$ = asd_new("!"); asd_add_child($$, $2); $$->type = $2->type; };
 
 primary_expr: TK_IDENTIFICADOR { $$ = asd_new($1.token_value);     
-        SymbolData *var = lookupSymbolWhenUsed(&stack, $1.token_value);
+        SymbolData *var = lookupSymbolWhenUsed(&stack, $1.token_value, $1.lineno, IDENTIFIER, $1.token_type, "");
         if(var->nature == FUNCTION){
-            printf("invalid expression! using non-identifier");
+            printf("Error: invalid expression! using %s of nature FUNCAO in line %d in left side of expression.. Function originally declared in line %d\n", $1.token_value, $1.lineno, var->line);
             exit(ERR_FUNCTION);
         }
         $$->type = var->type; 

@@ -1,14 +1,17 @@
+/*UFRGS 2023*/
+/* Grupo K */
+/*Carlos Eduardo Westermann - 00327212*/
+/*Théo Santiago Müller 00301593*/
+
 #ifndef SYMBOL_TABLE_H
 #define SYMBOL_TABLE_H
 
-#define MAX_SCOPES 100 // Defina o número máximo de escopos
+#define MAX_SCOPES 100 
 
-#define ERR_UNDECLARED 10 //2.2
-#define ERR_DECLARED 11 //2.2
-#define ERR_VARIABLE 20 //2.3
-#define ERR_FUNCTION 21 //2.3
-
-// Definições de enums e estruturas
+#define ERR_UNDECLARED 10 
+#define ERR_DECLARED 11 
+#define ERR_VARIABLE 20 
+#define ERR_FUNCTION 21 
 
 typedef enum {
     LITERAL ,
@@ -45,8 +48,6 @@ typedef struct {
 } TableStack;
 
 void print_all(TableStack* stack);
-
-// Assinaturas das funções
 void insertSymbol(SymbolTable* table, const char* key, int line, SymbolNature nature, SymbolType type, const char* value);
 SymbolData* lookupSymbol(SymbolTable* table, const char* key);
 void freeTable(SymbolTable* table);
@@ -54,9 +55,10 @@ void pushScope(TableStack* stack);
 void popScope(TableStack* stack);
 void insertSymbolWithScope(TableStack* stack, const char* key, int line, SymbolNature nature, SymbolType type, const char* value);
 void insertSymbolGlobal(TableStack* stack, const char* key, int line, SymbolNature nature, SymbolType type, const char* value);
-SymbolData* lookupSymbolWithScope(TableStack* stack, const char* key);
+SymbolData* lookupSymbolWithScope(TableStack* stack, const char* key, int line, SymbolNature nature, SymbolType type, const char* value);
 void updateSymbol(TableStack* stack, const char* key, const char* value);
-SymbolData* lookupSymbolWhenUsed(TableStack* stack, const char* key);
+SymbolData* lookupSymbolWhenUsed(TableStack* stack, const char* key, int line, SymbolNature nature, SymbolType type, const char* value);
 int inferType(int type1, int type2);
+char* get_nature(SymbolNature nature);
 
 #endif /* SYMBOL_TABLE_H */
