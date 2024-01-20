@@ -1,5 +1,10 @@
+/*UFRGS 2023*/
+/* Grupo K*/
+/*Carlos Eduardo Westermann - 00327212*/
+/*Théo Santiago Müller 00301593*/
+
 %{
-#include "tokens.h"
+#include "parser.tab.h"
 %}
 
 %option noyywrap
@@ -10,7 +15,7 @@
 "//".* { }
 "/*"([^*]|\*+[^*/])*\*+"/" { } 
 
-[ \t] { }
+[ \t] {}
 \n {}
 
 int return TK_PR_INT;
@@ -43,12 +48,12 @@ return return TK_PR_RETURN;
 "," return ',';
 ";" return ';';
 
-[0-9]+ return TK_LIT_INT;  
-[-+]?([0-9]*\.[0-9]+|[0-9]+\.)?([eE][-+]?[0-9]+)? return TK_LIT_FLOAT;
+[0-9]+ return TK_LIT_INT;
+([0-9]*\.[0-9]+|[0-9]+\.)?([0-9]+)? return TK_LIT_FLOAT;
 "false" return TK_LIT_FALSE;
 "true" return TK_LIT_TRUE;
 
-[a-zA-Z_][a-zA-Z0-9_]* return TK_IDENTIFICADOR;
+[a-z_][a-z0-9_]* return TK_IDENTIFICADOR;
 
 . return TK_ERRO;
 

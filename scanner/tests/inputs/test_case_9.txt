@@ -1,3 +1,0 @@
-while(x < y) {
-    float z = 10.5;
-}

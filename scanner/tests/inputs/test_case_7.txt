@@ -1,2 +1,0 @@
-int a = b + c - d;
-float f = g * h / i;

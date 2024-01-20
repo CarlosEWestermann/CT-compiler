@@ -1,5 +1,0 @@
-int x = 5; // Declaração de uma variável
-/* Isso é um
-comentário multi-linha */
-float y = 10.32;
-bool isTrue = false;

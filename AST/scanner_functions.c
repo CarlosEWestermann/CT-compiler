@@ -13,3 +13,4 @@ int get_line_number( ) {
 void yyerror (char const *mensagem) {
   printf("%d: %s",  yylineno, mensagem);
 }
+
