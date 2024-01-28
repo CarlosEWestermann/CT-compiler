@@ -8,6 +8,25 @@
 
 #include <stdio.h>
 
+typedef enum {
+    rfp,  
+    rsp,  
+    rbss, 
+    rpc, 
+} register_t;
+
+typedef struct {
+    int instruction;
+    int r1;
+    int r2;
+    int r3;
+} instruction_t;
+
+typedef struct {
+    instruction_t *instructions;
+    int length;
+} program_t;
+
 int generate_label();
 int generate_register();
 

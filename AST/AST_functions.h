@@ -24,6 +24,7 @@ typedef struct asd_tree {
     int number_of_children;
     struct asd_tree **children;
     struct asd_tree *next; 
+    program_t *program
 } asd_tree_t;
 
 asd_tree_t *asd_new(const char *label);
