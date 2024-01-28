@@ -242,7 +242,19 @@ arg: expr { $$ = $1; };
 
 return: TK_PR_RETURN expr { $$ = asd_new("return"); asd_add_child($$, $2); $$->type = $2->type; };
 
-conditional: TK_PR_IF '(' expr ')' no_scope_body { $$ = asd_new("if"); asd_add_child($$, $3); asd_add_child($$, $5); $$->type = $3->type; }
+conditional: TK_PR_IF '(' expr ')' no_scope_body { $$ = asd_new("if"); asd_add_child($$, $3); asd_add_child($$, $5); $$->type = $3->type; 
+                                                    /*//outline do codigo
+                                                    zeroReg = geraTemp()
+                                                    compReg = geraTemp()
+                                                    labelTrue = geraLabel()
+                                                    labelFalse = geraLabel()
+                                                    $$.code = "loadI 0 => %s", zeroReg ||
+                                                    $3.code ||
+                                                    "cmp_ne %s, %s => %s", zeroReg, $3.temp, compReg ||
+                                                    "cbr %s => %s, %s", compReg, labelTrue, labelFalse ||
+                                                    labelTrue ||
+                                                    $5.code ||
+                                                    labelFalse */ }
             | TK_PR_IF '(' expr ')' no_scope_body TK_PR_ELSE no_scope_body  { $$ = asd_new("if"); asd_add_child($$, $3); asd_add_child($$, $5); asd_add_child($$, $7); $$->type = $3->type; }
 
 while: TK_PR_WHILE '(' expr ')' no_scope_body { $$ = asd_new("while"); asd_add_child($$, $3); asd_add_child($$, $5); $$->type = $3->type;}

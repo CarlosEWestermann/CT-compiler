@@ -3,8 +3,8 @@ BISON = bison
 FLEX = flex
 CFLAGS = -Wall -Wno-unused-function # -fsanitize=address
 
-OBJECTS = main.o scanner_functions.o AST_functions.o parser.tab.o lex.yy.o symbol_table.o
-EXECUTABLE = etapa4
+OBJECTS = main.o scanner_functions.o AST_functions.o parser.tab.o lex.yy.o symbol_table.o code_generation_functions.o
+EXECUTABLE = etapa5
 
 all: $(EXECUTABLE)
 
@@ -12,6 +12,9 @@ AST_functions.o: AST_functions.c
 	$(CC) $(CFLAGS) $< -c
 
 scanner_functions.o: scanner_functions.c
+	$(CC) $(CFLAGS) $< -c 
+
+code_generation_functions.o: code_generation_functions.c
 	$(CC) $(CFLAGS) $< -c 
 
 main.o: main.c parser.tab.h 
