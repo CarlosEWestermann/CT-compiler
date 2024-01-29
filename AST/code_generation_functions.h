@@ -13,7 +13,7 @@ typedef enum {
     rsp,  
     rbss, 
     rpc, 
-} register_t;
+} iloc_register_t;
 
 typedef struct {
     int instruction;
