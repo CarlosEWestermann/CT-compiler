@@ -7,6 +7,7 @@
 #define CODE_GENERATION_FUNCTIONS_HPP
 
 #include <stdio.h>
+#include "AST_functions.h"
 
 typedef enum {
     rfp,  
@@ -29,5 +30,8 @@ typedef struct {
 
 int generate_label();
 int generate_register();
+
+void add_if(asd_tree_t *expression, asd_tree_t *body);
+void add_if_else(asd_tree_t *expression, asd_tree_t *if_body, asd_tree_t *else_body);
 
 #endif
