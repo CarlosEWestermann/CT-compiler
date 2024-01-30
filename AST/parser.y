@@ -255,14 +255,14 @@ conditional: TK_PR_IF '(' expr ')' no_scope_body { $$ = asd_new("if");
                                                    asd_add_child($$, $3); 
                                                    asd_add_child($$, $5); 
                                                    $$->type = $3->type; 
-                                                   add_if($$, $3); }
+                                                   add_if($$, $1, $3); }
 
             | TK_PR_IF '(' expr ')' no_scope_body TK_PR_ELSE no_scope_body  { $$ = asd_new("if"); 
                                                                               asd_add_child($$, $3); 
                                                                               asd_add_child($$, $5); 
                                                                               asd_add_child($$, $7); 
                                                                               $$->type = $3->type;
-                                                                              add_if_else($$, $3, $5); }
+                                                                              add_if_else($$, $1, $3, $5); }
 
 
 
@@ -277,67 +277,79 @@ logical_or_expr: logical_and_expr { $$ = $1; }
     | logical_or_expr TK_OC_OR logical_and_expr {$$ = asd_new("|"); 
                                                 asd_add_child($$, $1); 
                                                 asd_add_child($$, $3); 
-                                                $$->type = inferType($1->type, $3->type); };
+                                                $$->type = inferType($1->type, $3->type);
+                                                add_or($$, $1, $3); };
 
 logical_and_expr: equality_expr { $$ = $1; }
     | logical_and_expr TK_OC_AND equality_expr { $$ = asd_new("&"); 
                                                  asd_add_child($$, $1); 
                                                  asd_add_child($$, $3); 
-                                                 $$->type = inferType($1->type, $3->type);};
+                                                 $$->type = inferType($1->type, $3->type);
+                                                 add_and($$, $1, $3); };
 
 equality_expr: relational_expr { $$ = $1; }
     | equality_expr TK_OC_EQ relational_expr { $$ = asd_new("=="); 
                                                asd_add_child($$, $1); 
                                                asd_add_child($$, $3); 
-                                               $$->type = inferType($1->type, $3->type);}
+                                               $$->type = inferType($1->type, $3->type);
+                                               add_equals($$, $1, $3); }
 
     | equality_expr TK_OC_NE relational_expr { $$ = asd_new("!="); 
                                                asd_add_child($$, $1); 
                                                asd_add_child($$, $3); 
-                                               $$->type = inferType($1->type, $3->type);};
+                                               $$->type = inferType($1->type, $3->type);
+                                               add_not_equal($$, $1, $3); };
 
 relational_expr: add_sub_expr { $$ = $1; }
     | relational_expr '<' add_sub_expr { $$ = asd_new("<"); 
                                          asd_add_child($$, $1); 
                                          asd_add_child($$, $3); 
-                                         $$->type = inferType($1->type, $3->type);}
+                                         $$->type = inferType($1->type, $3->type);
+                                         add_less_than($$, $1, $3); }
 
     | relational_expr '>' add_sub_expr { $$ = asd_new(">"); 
                                          asd_add_child($$, $1); 
                                          asd_add_child($$, $3); 
-                                         $$->type = inferType($1->type, $3->type);}
+                                         $$->type = inferType($1->type, $3->type);
+                                         add_greater_than($$, $1, $3); }
 
     | relational_expr TK_OC_LE add_sub_expr { $$ = asd_new("<="); 
                                               asd_add_child($$, $1); 
                                               asd_add_child($$, $3); 
-                                              $$->type = inferType($1->type, $3->type);}
+                                              $$->type = inferType($1->type, $3->type);
+                                              add_less_equal($$, $1, $3); }
 
     | relational_expr TK_OC_GE add_sub_expr { $$ = asd_new(">="); 
                                               asd_add_child($$, $1); 
                                               asd_add_child($$, $3); 
-                                              $$->type = inferType($1->type, $3->type);};
+                                              $$->type = inferType($1->type, $3->type);
+                                              add_greater_equal($$, $1, $3); };
 
 add_sub_expr: mult_div_mod_expr { $$ = $1; }
     | add_sub_expr '+' mult_div_mod_expr { $$ = asd_new("+"); 
                                            asd_add_child($$, $1); 
                                            asd_add_child($$, $3); 
-                                           $$->type = inferType($1->type, $3->type);}
+                                           $$->type = inferType($1->type, $3->type);
+                                           add_add($$, $1, $3); }
 
     | add_sub_expr '-' mult_div_mod_expr { $$ = asd_new("-"); 
                                            asd_add_child($$, $1); 
                                            asd_add_child($$, $3); 
-                                           $$->type = inferType($1->type, $3->type);};
+                                           $$->type = inferType($1->type, $3->type);
+                                           add_sub($$, $1, $3); };
 
 mult_div_mod_expr: unary_expr { $$ = $1; }
     | mult_div_mod_expr '*' unary_expr { $$ = asd_new("*"); 
                                          asd_add_child($$, $1); 
                                          asd_add_child($$, $3); 
-                                         $$->type = inferType($1->type, $3->type);}
+                                         $$->type = inferType($1->type, $3->type);
+                                         add_mult($$, $1, $3); }
 
     | mult_div_mod_expr '/' unary_expr { $$ = asd_new("/"); 
                                          asd_add_child($$, $1); 
                                          asd_add_child($$, $3); 
-                                         $$->type = inferType($1->type, $3->type);}
+                                         $$->type = inferType($1->type, $3->type);
+                                         add_div($$, $1, $3); }
 
     | mult_div_mod_expr '%' unary_expr { $$ = asd_new("%"); 
                                          asd_add_child($$, $1); 

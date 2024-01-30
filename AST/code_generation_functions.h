@@ -31,7 +31,18 @@ typedef struct {
 int generate_label();
 int generate_register();
 
-void add_if(asd_tree_t *expression, asd_tree_t *body);
-void add_if_else(asd_tree_t *expression, asd_tree_t *if_body, asd_tree_t *else_body);
-
+void add_if(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *body);
+void add_if_else(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *if_body, asd_tree_t *else_body);
+void add_or(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
+void add_and(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
+void add_equals(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
+void add_not_equal(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
+void add_less_than(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
+void add_greater_than(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
+void add_less_equal(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
+void add_greater_equal(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
+void add_sub(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
+void add_add(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
+void add_mult(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
+void add_div(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
 #endif
