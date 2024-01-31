@@ -8,7 +8,20 @@
 
 #include "symbol_table.h"
 
-void insertSymbol(SymbolTable* table, const char* key, int line, SymbolNature nature, SymbolType type, const char* value) {
+int generate_global_offset() {
+    static int global_offset = 0;
+
+    global_offset += sizeof(int); 
+    return global_offset;
+}
+
+int generate_local_offset() {
+    static int local_offset = 0;
+
+    local_offset += sizeof(int); 
+    return local_offset;
+}
+void insertSymbol(SymbolTable* table, const char* key, int line, SymbolNature nature, SymbolType type, const char* value, bool is_global) {
     int i = strlen(key) % 100;
 
     TableEntry* newEntry = (TableEntry*)malloc(sizeof(TableEntry));
@@ -21,10 +34,13 @@ void insertSymbol(SymbolTable* table, const char* key, int line, SymbolNature na
         free(newEntry); 
         exit(-1);
     }
+
     strcpy(newEntry->key, key);
     newEntry->content.line = line;
     newEntry->content.nature = nature;
-    newEntry->content.type= type;
+    newEntry->content.type = type;
+    newEntry->content.is_global = is_global;
+    newEntry->content.memory_offset = is_global ? generate_global_offset() : generate_local_offset;
     strcpy(newEntry->content.value, value);
     newEntry->next = NULL;
 
@@ -94,7 +110,7 @@ void insertSymbolWithScope(TableStack* stack, const char* key, int line, SymbolN
         exit(ERR_DECLARED);
     }
     SymbolTable* currentScope = stack->stack[stack->top];
-    insertSymbol(currentScope, key, line, nature, type, value);
+    insertSymbol(currentScope, key, line, nature, type, value, false);
 }
 
 
@@ -105,7 +121,7 @@ void insertSymbolGlobal(TableStack* stack, const char* key, int line, SymbolNatu
         exit(ERR_DECLARED);
     }
     SymbolTable* globalScope = stack->stack[0];
-    insertSymbol(globalScope, key, line, nature, type, value);
+    insertSymbol(globalScope, key, line, nature, type, value, true);
 }
 
 SymbolData* lookupSymbolWithScope(TableStack* stack, const char* key, int line, SymbolNature nature, SymbolType type, const char* value) {

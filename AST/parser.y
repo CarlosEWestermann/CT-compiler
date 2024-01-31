@@ -93,7 +93,7 @@ global_declaration: type list_vars ';' {
     $$ = $2; 
     int i = 0;
     while(varList[i] != NULL && i < 100){
-        insertSymbolWithScope(&stack, varList[i], lineList[i], IDENTIFIER, $1, "");
+        insertSymbolGlobal(&stack, varList[i], lineList[i], IDENTIFIER, $1, "");
         i++;
     }
     for(i = 0; i < 100; i++){
@@ -373,6 +373,10 @@ primary_expr: TK_IDENTIFICADOR {
             exit(ERR_FUNCTION);
         }
         $$->type = var->type; 
+        $$->offset = var->offset;
+        $$->is_global = var->is_global;
+        //$$->code = load rx => $$->offset, $$->is_global ? rbss : rfp;
+        //$$->temp = rx;
         free($1.token_value); 
         }
     | TK_LIT_INT { $$ = asd_new($1.token_value); free($1.token_value); $$->type = INT; }

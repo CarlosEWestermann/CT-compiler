@@ -16,20 +16,28 @@ typedef enum {
     rpc, 
 } iloc_register_t;
 
+typedef enum {
+    add,
+    sub,
+    mul,
+    div,
+    loadI,
+} iloc_operation_t;
+
 typedef struct {
-    int instruction;
-    int r1;
-    int r2;
-    int r3;
+    iloc_operation_t operation;
+    char* r1;
+    char* r2;
+    char* r3;
 } instruction_t;
 
 typedef struct {
-    instruction_t *instructions;
     int length;
+    instruction_t *instructions;
 } program_t;
 
-int generate_label();
-int generate_register();
+char* generate_label;
+char* generate_register;
 
 void add_if(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *body);
 void add_if_else(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *if_body, asd_tree_t *else_body);

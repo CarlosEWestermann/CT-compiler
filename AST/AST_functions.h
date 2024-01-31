@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #define ARQUIVO_SAIDA "saida.dot"
 
 typedef struct {
@@ -25,7 +26,9 @@ typedef struct asd_tree {
     struct asd_tree **children;
     struct asd_tree *next;
     int temp;
-    char *code;
+    int offset;
+    bool is_global;
+    program_t *code;
 } asd_tree_t;
 
 asd_tree_t *asd_new(const char *label);
