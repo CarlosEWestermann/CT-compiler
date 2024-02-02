@@ -7,7 +7,7 @@
 #define CODE_GENERATION_FUNCTIONS_HPP
 
 #include <stdio.h>
-#include "AST_functions.h"
+#include <stdbool.h>
 
 typedef enum {
     rfp,  
@@ -20,37 +20,57 @@ typedef enum {
     add,
     sub,
     mul,
-    div,
+    cmp_ne,
+    cmp_eq,
+    cbr,
     loadI,
+    label,
 } iloc_operation_t;
+
+typedef enum {
+    REGISTER, LABEL
+} operand_type_t;
+
+typedef struct {
+    operand_type_t type;
+    union {
+        char* label;
+        char* registerName;
+    } operand;
+} operand_t;
 
 typedef struct {
     iloc_operation_t operation;
-    char* r1;
-    char* r2;
-    char* r3;
+    operand_t* operands; 
+    int num_operands; 
 } instruction_t;
 
 typedef struct {
-    int length;
+    int size;
     instruction_t *instructions;
 } program_t;
 
-char* generate_label;
-char* generate_register;
+typedef struct asd_tree {
+    char *label;
+    int type;
+    char *value;
+    int number_of_children;
+    struct asd_tree **children;
+    struct asd_tree *next;
+    int temp;
+    int offset;
+    bool is_global;
+    program_t *code;
+} asd_tree_t;
 
+char* generate_label();
+char* generate_register();
+instruction_t create_instruction(iloc_operation_t operation, operand_t operands[], int num_operands);
+void free_instruction(instruction_t* instruction);
+void add_instruction_to_program(program_t *program, instruction_t instruction);
+/* void add_binop(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression, iloc_operation_t operation);
+void add_unop(asd_tree_t *head, asd_tree_t *expression, iloc_operation_t operation);*/
 void add_if(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *body);
-void add_if_else(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *if_body, asd_tree_t *else_body);
-void add_or(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
-void add_and(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
-void add_equals(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
-void add_not_equal(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
-void add_less_than(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
-void add_greater_than(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
-void add_less_equal(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
-void add_greater_equal(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
-void add_sub(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
-void add_add(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
-void add_mult(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
-void add_div(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression);
+void add_if_else(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *if_body, asd_tree_t *else_body); 
+
 #endif

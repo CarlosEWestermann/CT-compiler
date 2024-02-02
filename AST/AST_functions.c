@@ -3,9 +3,6 @@
 /*Carlos Eduardo Westermann - 00327212*/
 /*Théo Santiago Müller 00301593*/
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include "AST_functions.h"
 #define ARQUIVO_SAIDA "saida.dot"
 

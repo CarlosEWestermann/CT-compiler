@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "code_generation_functions.h": "c",
+        "stdio.h": "c",
+        "array": "c",
+        "string_view": "c",
+        "initializer_list": "c",
+        "utility": "c",
+        "system_error": "c",
+        "stdbool.h": "c",
+        "stdlib.h": "c"
+    }
+}
