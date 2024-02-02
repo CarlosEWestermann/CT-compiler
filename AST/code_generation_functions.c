@@ -136,144 +136,49 @@ void add_if_else(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *if_body, 
     append_program(head->code, else_body->code);
 }
 
-/* void add_binop(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression, iloc_operation_t operation) {
-    int total_size = first_expression->code->size + second_expression->code->size;
-    instruction_t *combined_instructions = (instruction_t *)malloc(total_size * sizeof(instruction_t));
+void add_binop(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression, iloc_operation_t operation) {
+    char* temp_register = generate_register(); 
+
+    append_program(head->code, first_expression->code);
+    append_program(head->code, second_expression->code);
+
     
-    for (int i = 0; i < first_expression->code->size; i++) {
-        combined_instructions[i] = first_expression->code->instructions[i];
-    }
+    char first_reg[20]; 
+    char second_reg[20];
+    snprintf(first_reg, sizeof(first_reg), "R%d", first_expression->temp); 
+    snprintf(second_reg, sizeof(second_reg), "R%d", second_expression->temp); 
 
-    for (int i = 0; i < second_expression->code->size; i++) {
-        combined_instructions[first_expression->code->size + i] = second_expression->code->instructions[i];
-    }
 
-    if (head->code->instructions != NULL) {
-        free(head->code->instructions);
-    }
+    operand_t operation_operands[] = {
+        { .type = REGISTER, .operand.registerName = first_reg },
+        { .type = REGISTER, .operand.registerName = second_reg },
+        { .type = REGISTER, .operand.registerName = temp_register }
+    };
 
-    head->code->instructions = combined_instructions;
-    head->code->size = total_size;
-
-    char *temp_register = generate_register(); 
-
-    operand_t operands[3];
-    operands[0].type = REGISTER;
-    operands[0].operand.registerName = malloc(20); 
-    snprintf(operands[0].operand.registerName, 20, "R%d", first_expression->temp);
-
-    operands[1].type = REGISTER;
-    operands[1].operand.registerName = malloc(20);
-    snprintf(operands[1].operand.registerName, 20, "R%d", second_expression->temp);
-
-    operands[2].type = REGISTER;
-    operands[2].operand.registerName = temp_register; 
-
-    instruction_t new_binop = create_instruction(operation, operands, 3);
-    add_instruction_to_program(head->code, new_binop);
+    add_instruction_to_program(head->code, create_instruction(operation, operation_operands, 3));
 
     head->temp = atoi(temp_register + 1);
-
-    free(operands[0].operand.registerName);
-    free(operands[1].operand.registerName);
 }
 
-void add_unop(asd_tree_t *head, asd_tree_t *expression, iloc_operation_t operation) {
-    int total_size = expression->code->size;
-    instruction_t *copied_instructions = (instruction_t *)malloc(total_size * sizeof(instruction_t));
-    
-    for (int i = 0; i < expression->code->size; i++) {
-        copied_instructions[i] = expression->code->instructions[i];
-    }
+void add_unop(asd_tree_t *head, asd_tree_t *first_expression, iloc_operation_t operation) {
+    char* temp_register = generate_register(); 
+
+    append_program(head->code, first_expression->code);
 
     
-    if (head->code->instructions != NULL) {
-        free(head->code->instructions);
-    }
+    char first_reg[20]; 
+    snprintf(first_reg, sizeof(first_reg), "R%d", first_expression->temp); 
 
-    head->code->instructions = copied_instructions;
-    head->code->size = total_size;
 
-    char *temp_register = generate_register(); 
-    operand_t operand;
-    operand.type = REGISTER;
-    operand.operand.registerName = malloc(20); 
-    snprintf(operand.operand.registerName, 20, "R%d", expression->temp);
+    operand_t operation_operands[] = {
+        { .type = REGISTER, .operand.registerName = first_reg },
+        { .type = REGISTER, .operand.registerName = temp_register }
+    };
 
-    operand_t operands[2];
-    operands[0] = operand;
-    operands[1].type = REGISTER;
-    operands[1].operand.registerName = temp_register; 
+    add_instruction_to_program(head->code, create_instruction(operation, operation_operands, 3));
 
-    instruction_t new_unop = create_instruction(operation, operands, 2);
-    add_instruction_to_program(head->code, new_unop);
-
-    head->temp = atoi(temp_register + 1); 
-
-    free(operand.operand.registerName);
+    head->temp = atoi(temp_register + 1);
 }
-
-
-//void add_if(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *body){
-    
-    int zero_register_id = generate_register();
-    int comparison_register_id = generate_register();
-    int label_true_id = generate_label();
-    int label_false_id = generate_label();
-    
-    char label_true[10], label_false[10], zero_register[10], comparison_register[10];
-    sprintf(label_true, "L%d", label_true_id);
-    sprintf(label_false, "L%d", label_false_id);
-    sprintf(zero_register, "R%d", zero_register_id);
-    sprintf(comparison_register, "R%d", comparison_register_id);
-
-    sprintf(head->code, "loadI 0 => r%s\n", zero_register);
-    strcat(head->code, expression.code);
-
-    char[100] cmp_ne_code;
-    sprintf(cmp_code, "cmp_ne %s, R%d => %s", zero_register, expression.temp, comparison_register)
-    strcat(head->code, cmp_ne_code);
-
-    char[100] cbr_code;
-    sprintf(cbr_code, "cbr %s => %s, %s", comparison_register, label_true, label_false);
-    strcat(head->code, cmp_code);
-
-    strcat(head->code, label_true);
-    strcat(head->code, body.code);
-    strcat(head->code, label_false);
-    */
-//}
-
-//void add_if_else(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *if_body, asd_tree_t *else_body){
-    /*
-    int zero_register_id = generate_register();
-    int comparison_register_id = generate_register();
-    int label_true_id = generate_label();
-    int label_false_id = generate_label();
-    
-    char label_true[10], label_false[10], zero_register[10], comparison_register[10];
-    sprintf(label_true, "L%d", label_true_id);
-    sprintf(label_false, "L%d", label_false_id);
-    sprintf(zero_register, "R%d", zero_register_id);
-    sprintf(comparison_register, "R%d", comparison_register_id);
-
-    sprintf(head->code, "loadI 0 => r%s\n", zero_register);
-    strcat(head->code, expression.code);
-
-    char[100] cmp_ne_code;
-    sprintf(cmp_code, "cmp_ne %s, R%d => %s", zero_register, expression.temp, comparison_register)
-    strcat(head->code, cmp_ne_code);
-
-    char[100] cbr_code;
-    sprintf(cbr_code, "cbr %s => %s, %s", comparison_register, label_true, label_false);
-    strcat(head->code, cmp_code);
-
-    strcat(head->code, label_true);
-    strcat(head->code, body.code);
-    strcat(head->code, label_false);
-    strcat(head->code, else_body.code);
-    */
-//}
 
 /*void add_binop(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t * second_expression, iloc_operation_t operation) {
     int temp_register = generate_register();

@@ -20,6 +20,13 @@ typedef enum {
     add,
     sub,
     mul,
+    divi,
+    ge,
+    gt,
+    le,
+    lt,
+    and,
+    or,
     cmp_ne,
     cmp_eq,
     cbr,
@@ -68,8 +75,8 @@ char* generate_register();
 instruction_t create_instruction(iloc_operation_t operation, operand_t operands[], int num_operands);
 void free_instruction(instruction_t* instruction);
 void add_instruction_to_program(program_t *program, instruction_t instruction);
-/* void add_binop(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression, iloc_operation_t operation);
-void add_unop(asd_tree_t *head, asd_tree_t *expression, iloc_operation_t operation);*/
+void add_binop(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression, iloc_operation_t operation);
+void add_unop(asd_tree_t *head, asd_tree_t *first_expression, iloc_operation_t operation);
 void add_if(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *body);
 void add_if_else(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *if_body, asd_tree_t *else_body); 
 

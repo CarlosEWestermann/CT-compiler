@@ -1911,7 +1911,7 @@ yyreduce:
                                                 asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                                 asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                                 (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
-                                                //add_or($$, $1, $3); 
+                                                add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), or); 
                                                 }
 #line 1917 "parser.tab.c"
     break;
@@ -1928,7 +1928,7 @@ yyreduce:
                                                  asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                                  asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                                  (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
-                                                 //add_and($$, $1, $3); 
+                                                 add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), and); 
                                                  }
 #line 1934 "parser.tab.c"
     break;
@@ -1945,7 +1945,7 @@ yyreduce:
                                                asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                                asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                                (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
-                                               //add_equals($$, $1, $3); 
+                                               add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), cmp_eq); 
                                                }
 #line 1951 "parser.tab.c"
     break;
@@ -1956,7 +1956,7 @@ yyreduce:
                                                asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                                asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                                (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
-                                               //add_not_equal($$, $1, $3); 
+                                               add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), cmp_ne);
                                                }
 #line 1962 "parser.tab.c"
     break;
@@ -1973,7 +1973,7 @@ yyreduce:
                                          asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                          asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                          (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
-                                         //add_less_than($$, $1, $3);
+                                         add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), lt);
                                           }
 #line 1979 "parser.tab.c"
     break;
@@ -1984,7 +1984,7 @@ yyreduce:
                                          asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                          asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                          (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
-                                         //add_greater_than($$, $1, $3); 
+                                         add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), gt);
                                          }
 #line 1990 "parser.tab.c"
     break;
@@ -1995,7 +1995,7 @@ yyreduce:
                                               asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                               asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                               (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
-                                              //add_less_equal($$, $1, $3); 
+                                              add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), le);
                                               }
 #line 2001 "parser.tab.c"
     break;
@@ -2006,7 +2006,7 @@ yyreduce:
                                               asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                               asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                               (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
-                                              //add_greater_equal($$, $1, $3); 
+                                              add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), ge);
                                               }
 #line 2012 "parser.tab.c"
     break;
@@ -2023,7 +2023,7 @@ yyreduce:
                                            asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                            asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                            (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
-                                           //add_add($$, $1, $3);
+                                           add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), add);
                                            }
 #line 2029 "parser.tab.c"
     break;
@@ -2034,7 +2034,7 @@ yyreduce:
                                            asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                            asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                            (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
-                                           //add_sub($$, $1, $3);
+                                           add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), sub);
                                             }
 #line 2040 "parser.tab.c"
     break;
@@ -2051,7 +2051,7 @@ yyreduce:
                                          asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                          asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                          (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
-                                         //add_mult($$, $1, $3); 
+                                         add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), mul);
                                          }
 #line 2057 "parser.tab.c"
     break;
@@ -2062,7 +2062,7 @@ yyreduce:
                                          asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                          asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                          (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
-                                         //add_div($$, $1, $3); 
+                                         add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), divi); 
                                          }
 #line 2068 "parser.tab.c"
     break;
