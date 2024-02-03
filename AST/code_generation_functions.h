@@ -34,6 +34,8 @@ typedef enum {
     loadI,
     label,
     jumpI,
+    halt,
+    storeAI,
     nop,
 } iloc_operation_t;
 
@@ -84,5 +86,6 @@ void add_while(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *body);
 void print_instruction(instruction_t* instr);
 void print_program(asd_tree_t *head);
 const char* OperationToString(iloc_operation_t op);
+void set_main();
 
 #endif

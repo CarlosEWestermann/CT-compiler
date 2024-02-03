@@ -7,7 +7,8 @@
 #include "AST_functions.h"
 
 int temp_register = 0;
-int temp_label = 0;
+int temp_label = 1;
+bool main_flag = false;
 
 char* generate_label() {
     char* label_buf = malloc(20); 
@@ -180,20 +181,29 @@ void print_instruction(instruction_t* instr) {
         case divi:
         case and:
         case or:
-        case cmp_ne:
-        case cmp_eq:
         case ge:
         case gt:
         case loadAI:
         case le:
         case lt:
             if (instr->operand1) printf("%s, ", instr->operand1);
-            if (instr->operand2) printf("%s, ", instr->operand2);
+            if (instr->operand2) printf("%s ", instr->operand2);
             if (instr->operand3) printf("=> %s", instr->operand3);
             break;
-        case cbr:
+        case cmp_ne:
+        case cmp_eq:
             if (instr->operand1) printf("%s, ", instr->operand1);
+            if (instr->operand2) printf("%s ", instr->operand2);
+            if (instr->operand3) printf("-> %s", instr->operand3);
+            break;
+        case cbr:
+            if (instr->operand1) printf("%s ", instr->operand1);
             if (instr->operand2) printf("-> %s, ", instr->operand2);
+            if (instr->operand3) printf("%s", instr->operand3);
+            break;
+        case storeAI:
+            if (instr->operand1) printf("%s ", instr->operand1);
+            if (instr->operand2) printf("=> %s, ", instr->operand2);
             if (instr->operand3) printf("%s", instr->operand3);
             break;
         case loadI:
@@ -202,6 +212,7 @@ void print_instruction(instruction_t* instr) {
             break;
         case jumpI:
             if (instr->operand1) printf("-> %s ", instr->operand1);
+            break;
         default:
             break;
     }
@@ -210,10 +221,13 @@ void print_instruction(instruction_t* instr) {
 }
 
 void print_program(asd_tree_t *head) {
-    if (!head->code || !head->code->instructions) return;
-
-    for (int i = 0; i < head->code->size; i++) {
-        print_instruction(&head->code->instructions[i]);
+    if(main_flag == true){
+        printf("\njumpI -> L1\n");
+        if (!head->code || !head->code->instructions) return;
+        
+        for (int i = 0; i < head->code->size; i++) {
+            print_instruction(&head->code->instructions[i]);
+        }
     }
 }
 
@@ -230,14 +244,20 @@ const char* OperationToString(iloc_operation_t op) {
         case lt:      return "lt";
         case and:     return "and";
         case or:      return "or";
-        case cmp_ne:  return "cmp_ne";
-        case cmp_eq:  return "cmp_eq";
+        case cmp_ne:  return "cmp_NE";
+        case cmp_eq:  return "cmp_EQ";
         case cbr:     return "cbr";
         case loadAI:  return "loadAI";
         case loadI:   return "loadI";
         case label:   return "label";
         case nop:     return "nop";
         case jumpI:   return "jumpI";
+        case halt:    return "halt";
+        case storeAI: return "storeAI";
         default:      return "";
     }
+}
+
+void set_main() {
+    main_flag = true;
 }

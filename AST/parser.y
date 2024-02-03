@@ -73,7 +73,9 @@ init: /* empty */ { $$ = NULL; }
     | element init  {
                         if($1 != NULL) {
                             $$ = $1; 
-                            asd_add_child($$, $2); 
+                            asd_add_child($$, $2);
+                            if($2 != NULL)
+                                append_program($$->code, $2->code); 
                         } else {
                             $$ = $2;
                         } 
@@ -140,6 +142,11 @@ list_vars: TK_IDENTIFICADOR {   $$ = NULL;
 
 function: push_scope header no_scope_body pop_scope { $$ = $2; 
                                                       asd_add_child($$, $3);
+                                                      if(strcmp($2->label, "main") == 0 && $3->code->size != 0){
+                                                        $3->code->instructions[0].label = strdup("L1");
+                                                        add_instruction_to_program($3->code, create_instruction(halt, NULL, NULL, NULL, NULL, 0));
+                                                        set_main();
+                                                      }
                                                       append_program($$->code, $3->code); };
 
 header: '(' param_list ')' TK_OC_GE type '!' TK_IDENTIFICADOR { $$ = asd_new($7.token_value); 
@@ -206,10 +213,17 @@ attrib: TK_IDENTIFICADOR '=' expr { $$ = asd_new("=");
                                     asd_add_child($$, $3); 
                                     SymbolData *var = lookupSymbolWhenUsed(&stack, $1.token_value, $1.lineno, IDENTIFIER, $1.token_type, "");
                                     if(var->nature == FUNCTION){
-                                            printf("Error: invalid expression! using %s of nature FUNCAO in line %d in left side of expression. Function originally declared in line %d\n", $1.token_value, $1.lineno, var->line);
+                                            printf("Error: invalid expression! using %s of nature function in line %d in left side of expression. Function originally declared in line %d\n", $1.token_value, $1.lineno, var->line);
                                             exit(ERR_FUNCTION);
                                         }
-                                    $$->type = var->type;
+                                    $$->type = var->type; 
+                                    $$->offset = var->memory_offset;
+                                    $$->is_global = var->is_global;
+                                    char temp_offset[80];
+                                    char* temp_offset_register = generate_register();
+                                    sprintf(temp_offset, "%i", $$->offset);
+                                    add_instruction_to_program($$->code, create_instruction(loadI, temp_offset, temp_offset_register, NULL, NULL, 2));
+                                    add_instruction_to_program($$->code, create_instruction(storeAI, $3->temp, temp_offset_register, $$->is_global ? "rbss" : "rfp", NULL, 3));
                                     free($1.token_value);
                                     };
 
@@ -252,7 +266,8 @@ arg: expr { $$ = $1; };
 return: TK_PR_RETURN expr { $$ = asd_new("return");
                             asd_add_child($$, $2); 
                             $$->type = $2->type; 
-                            append_program($$->code, $2->code);};
+                            //append_program($$->code, $2->code);
+                            };
 
 conditional: TK_PR_IF '(' expr ')' no_scope_body { $$ = asd_new("if"); 
                                                    asd_add_child($$, $3); 

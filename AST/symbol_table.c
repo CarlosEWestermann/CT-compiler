@@ -9,14 +9,14 @@
 #include "symbol_table.h"
 
 int generate_global_offset() {
-    static int global_offset = 0;
+    static int global_offset = -4;
 
     global_offset += sizeof(int); 
     return global_offset;
 }
 
 int generate_local_offset() {
-    static int local_offset = 0;
+    static int local_offset = -4;
 
     local_offset += sizeof(int); 
     return local_offset;

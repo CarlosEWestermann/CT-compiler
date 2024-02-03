@@ -1,0 +1,21 @@
+jumpI -> L1
+L1: loadAI rfp, 0 => r1
+loadI 1 => r2 
+cmp_EQ r1, r2 -> r3
+loadI 0 => r8 
+cmp_NE r8, r3 -> r9
+cbr r9 -> L2, L3
+L2: loadI 0 => r7 
+storeAO r6 => r7, rfp
+L3: nop 
+L4: loadI 1 => r10 
+loadI 2 => r11 
+cmp_EQ r10, r11 -> r12
+loadI 0 => r17 
+cmp_NE r17, r12 -> r18
+cbr r18 -> L5, L6
+L5: loadI 0 => r16 
+storeAO r15 => r16, rfp
+jumpI -> L4 
+L6: nop 
+halt 
