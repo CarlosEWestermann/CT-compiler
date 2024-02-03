@@ -6,8 +6,7 @@
 %code top { #include "symbol_table.h"
             #include <stdlib.h> }
 
-%code requires { #include "AST_functions.h"
-                 #include "code_generation_functions.h" }
+%code requires { #include "AST_functions.h" }
 %{
     int yylex(void);
     void yyerror (char const *mensagem);
@@ -140,7 +139,8 @@ list_vars: TK_IDENTIFICADOR {   $$ = NULL;
                                             free($3.token_value); };
 
 function: push_scope header no_scope_body pop_scope { $$ = $2; 
-                                                      asd_add_child($$, $3); };
+                                                      asd_add_child($$, $3);
+                                                      append_program($$->code, $3->code); };
 
 header: '(' param_list ')' TK_OC_GE type '!' TK_IDENTIFICADOR { $$ = asd_new($7.token_value); 
                                                                 insertSymbolGlobal(&stack, $7.token_value, $7.lineno, FUNCTION, $5, "");
@@ -167,6 +167,7 @@ command_list: command { $$ = $1; }
                                             $$ = $$->next;
                                         }
                                         asd_add_child($$, $2);
+                                        append_program($$->code, $2->code);
                                         $$->next=$2;
                                         $$ = $1;
                                     };}
@@ -201,7 +202,7 @@ local_var_dec: type list_vars {
     } };
 
 attrib: TK_IDENTIFICADOR '=' expr { $$ = asd_new("="); 
-                                    asd_add_child($$, asd_new($1.token_value)); 
+                                    asd_add_child($$, asd_new($1.token_value));
                                     asd_add_child($$, $3); 
                                     SymbolData *var = lookupSymbolWhenUsed(&stack, $1.token_value, $1.lineno, IDENTIFIER, $1.token_type, "");
                                     if(var->nature == FUNCTION){
@@ -244,7 +245,7 @@ function_call: TK_IDENTIFICADOR '(' arg_list ')' {
 
 
 arg_list: arg { $$ = $1; }
-    | arg ',' arg_list { $$ = $1; asd_add_child($$, $3); };
+    | arg ',' arg_list { $$ = $1; asd_add_child($$, $3); append_program($$->code, $3->code); };
 
 arg: expr { $$ = $1; };
 
@@ -336,7 +337,9 @@ relational_expr: add_sub_expr { $$ = $1; }
 add_sub_expr: mult_div_mod_expr { $$ = $1; }
     | add_sub_expr '+' mult_div_mod_expr { $$ = asd_new("+"); 
                                            asd_add_child($$, $1); 
+                                           //append_program($$->code, $1->code);
                                            asd_add_child($$, $3); 
+                                           //append_program($$->code, $3->code);
                                            $$->type = inferType($1->type, $3->type);
                                            add_binop($$, $1, $3, add);
                                            }
@@ -391,7 +394,14 @@ primary_expr: TK_IDENTIFICADOR {
         //$$->temp = rx;
         free($1.token_value); 
         }
-    | TK_LIT_INT { $$ = asd_new($1.token_value); free($1.token_value); $$->type = INT; }
+    | TK_LIT_INT { $$ = asd_new($1.token_value);  $$->type = INT; 
+                    char* temp_register = generate_register();
+  
+    add_instruction_to_program($$->code, create_instruction(loadI, temp_register, $1.token_value, NULL, NULL, 2));
+    $$->temp = temp_register;
+    free($1.token_value);
+    //free(temp_register);
+    }
     | TK_LIT_FLOAT { $$ = asd_new($1.token_value); free($1.token_value); $$->type = FLOAT; }
     | TK_LIT_TRUE { $$ = asd_new($1.token_value); free($1.token_value); $$->type = BOOL; }
     | TK_LIT_FALSE { $$ = asd_new($1.token_value); free($1.token_value); $$->type = BOOL; }

@@ -24,25 +24,31 @@ char* generate_register() {
     return register_buf;
 }
 
-instruction_t create_instruction(iloc_operation_t operation, operand_t operands[], int num_operands) {
+instruction_t create_instruction(iloc_operation_t operation, char* operand1, char* operand2, char* operand3, char* label, int num_operands) {
     instruction_t new_instruction;
+
     new_instruction.operation = operation;
     new_instruction.num_operands = num_operands;
-    new_instruction.operands = (operand_t*)malloc(num_operands * sizeof(operand_t));
-    for (int i = 0; i < num_operands; i++) {
-        new_instruction.operands[i] = operands[i];
-    }
+    new_instruction.operand1 = operand1 == NULL ? NULL : strdup(operand1);
+    new_instruction.operand2 = operand2 == NULL  ? NULL : strdup(operand2);
+    new_instruction.operand3 = operand3 == NULL ? NULL : strdup(operand3);
+    new_instruction.label = label == NULL ? NULL : strdup(label);
+
     return new_instruction;
 }
 
 void free_instruction(instruction_t* instruction) {
-    free(instruction->operands);
+    free(instruction->operand1);
+    free(instruction->operand2);
+    free(instruction->operand3);
+    free(instruction->label);
 }
 
 void add_instruction_to_program(program_t *program, instruction_t instruction) {
     program->instructions = realloc(program->instructions, (program->size + 1) * sizeof(instruction_t));
     program->instructions[program->size] = instruction;
     program->size++;
+    //free_instruction(&instruction);
 }
 
 void append_program(program_t *destination, program_t *source) {
@@ -62,39 +68,21 @@ void add_if(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *body) {
     char* zero_register = generate_register();
     char* comparison_register = generate_register();
     char* label_true = generate_label();
-    char* label_end = generate_label();
+    char* label_false = generate_label();
 
     append_program(head->code, expression->code);
 
-    operand_t loadI_operands[] = {
-        { .type = REGISTER, .operand.registerName = zero_register },
-        { .type = LABEL, .operand.label = "0" } 
-    };
-    add_instruction_to_program(head->code, create_instruction(loadI, loadI_operands, 2));
+    add_instruction_to_program(head->code, create_instruction(loadI, "0", zero_register, NULL, NULL, 2));
 
-    operand_t cmp_ne_operands[] = {
-        { .type = REGISTER, .operand.registerName = zero_register },
-        { .type = REGISTER, .operand.registerName = malloc(20) }, 
-        { .type = REGISTER, .operand.registerName = comparison_register }
-    };
-    snprintf(cmp_ne_operands[1].operand.registerName, 20, "r%d", expression->temp); 
-    add_instruction_to_program(head->code, create_instruction(cmp_ne, cmp_ne_operands, 3));
-    free(cmp_ne_operands[1].operand.registerName);
+    add_instruction_to_program(head->code, create_instruction(cmp_ne, zero_register, expression->temp, comparison_register, NULL, 3));
 
-    operand_t cbr_operands[] = {
-        { .type = REGISTER, .operand.registerName = comparison_register },
-        { .type = LABEL, .operand.label = label_true },
-        { .type = LABEL, .operand.label = label_end }
-    };
-    add_instruction_to_program(head->code, create_instruction(cbr, cbr_operands, 3));
+    add_instruction_to_program(head->code, create_instruction(cbr, comparison_register, label_true, label_false, NULL, 3));
 
-    operand_t label_true_operand = { .type = LABEL, .operand.label = label_true };
-    add_instruction_to_program(head->code, create_instruction(label, &label_true_operand, 1));
+    body->code->instructions[0].label = label_true;
 
     append_program(head->code, body->code);
 
-    operand_t label_end_operand = { .type = LABEL, .operand.label = label_end };
-    add_instruction_to_program(head->code, create_instruction(label, &label_end_operand, 1));
+    add_instruction_to_program(head->code, create_instruction(nop, NULL, NULL, NULL, label_false, 0));
 }
 
 void add_if_else(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *if_body, asd_tree_t *else_body) {
@@ -105,36 +93,17 @@ void add_if_else(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *if_body, 
 
     append_program(head->code, expression->code);
 
-    operand_t loadI_operands[] = {
-        { .type = REGISTER, .operand.registerName = zero_register },
-        { .type = LABEL, .operand.label = "0" } 
-    };
-    add_instruction_to_program(head->code, create_instruction(loadI, loadI_operands, 2));
+    add_instruction_to_program(head->code, create_instruction(loadI, "0", zero_register, NULL, NULL, 2));
 
-    operand_t cmp_ne_operands[] = {
-        { .type = REGISTER, .operand.registerName = zero_register },
-        { .type = REGISTER, .operand.registerName = malloc(20) }, 
-        { .type = REGISTER, .operand.registerName = comparison_register }
-    };
-    snprintf(cmp_ne_operands[1].operand.registerName, 20, "r%d", expression->temp); 
-    add_instruction_to_program(head->code, create_instruction(cmp_ne, cmp_ne_operands, 3));
-    free(cmp_ne_operands[1].operand.registerName);
+    add_instruction_to_program(head->code, create_instruction(cmp_ne, zero_register, expression->temp, comparison_register, NULL, 3));
 
-    operand_t cbr_operands[] = {
-        { .type = REGISTER, .operand.registerName = comparison_register },
-        { .type = LABEL, .operand.label = label_true },
-        { .type = LABEL, .operand.label = label_false }
-    };
+    add_instruction_to_program(head->code, create_instruction(cbr, comparison_register, label_true, label_false, NULL, 3));
 
-    add_instruction_to_program(head->code, create_instruction(cbr, cbr_operands, 3));
-
-    operand_t label_true_operand = { .type = LABEL, .operand.label = label_true };
-    add_instruction_to_program(head->code, create_instruction(label, &label_true_operand, 1));
+    if_body->code->instructions[0].label = label_true;
 
     append_program(head->code, if_body->code);
 
-    operand_t label_end_operand = { .type = LABEL, .operand.label = label_false };
-    add_instruction_to_program(head->code, create_instruction(label, &label_end_operand, 1));
+    else_body->code->instructions[0].label = label_false;
 
     append_program(head->code, else_body->code);
 }
@@ -145,22 +114,9 @@ void add_binop(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *secon
     append_program(head->code, first_expression->code);
     append_program(head->code, second_expression->code);
 
-    
-    char first_reg[20]; 
-    char second_reg[20];
-    snprintf(first_reg, sizeof(first_reg), "r%d", first_expression->temp); 
-    snprintf(second_reg, sizeof(second_reg), "r%d", second_expression->temp); 
+    add_instruction_to_program(head->code, create_instruction(operation, first_expression->temp, second_expression->temp, temp_register, NULL, 3));
 
-
-    operand_t operation_operands[] = {
-        { .type = REGISTER, .operand.registerName = first_reg },
-        { .type = REGISTER, .operand.registerName = second_reg },
-        { .type = REGISTER, .operand.registerName = temp_register }
-    };
-
-    add_instruction_to_program(head->code, create_instruction(operation, operation_operands, 3));
-
-    head->temp = atoi(temp_register + 1);
+    head->temp = temp_register;
 }
 
 void add_unop(asd_tree_t *head, asd_tree_t *first_expression, iloc_operation_t operation) {
@@ -168,26 +124,73 @@ void add_unop(asd_tree_t *head, asd_tree_t *first_expression, iloc_operation_t o
 
     append_program(head->code, first_expression->code);
 
-    
-    char first_reg[20]; 
-    snprintf(first_reg, sizeof(first_reg), "r%d", first_expression->temp); 
+    add_instruction_to_program(head->code, create_instruction(operation, first_expression->temp, temp_register, NULL, NULL, 2));
 
+    head->temp = temp_register;
+}
 
-    operand_t operation_operands[] = {
-        { .type = REGISTER, .operand.registerName = first_reg },
-        { .type = REGISTER, .operand.registerName = temp_register }
-    };
+void print_instruction(instruction_t* instr) {
+    if (!instr) return;
+    if (instr->label) printf("%s ", instr->label);
+    printf("%s ", OperationToString(instr->operation));
+    switch (instr->operation) {
+        case add:
+        case sub:
+        case mul:
+        case divi:
+        case and:
+        case or:
+        case cmp_ne:
+        case cmp_eq:
+        case ge:
+        case gt:
+        case le:
+        case lt:
+            if (instr->operand1) printf("%s, ", instr->operand1);
+            if (instr->operand2) printf("%s, ", instr->operand2);
+            if (instr->operand3) printf("=> %s", instr->operand3);
+            break;
+        case cbr:
+            if (instr->operand1) printf("%s, ", instr->operand1);
+            if (instr->operand2) printf("=> %s, ", instr->operand2);
+            if (instr->operand3) printf("%s", instr->operand3);
+        case loadI:
+            if (instr->operand1) printf("%s =>", instr->operand1);
+            if (instr->operand1) printf("%s ", instr->operand2);
+        default:
+            printf("nop");
+    }
 
-    add_instruction_to_program(head->code, create_instruction(operation, operation_operands, 3));
-
-    head->temp = atoi(temp_register + 1);
+    printf("\n");
 }
 
 void print_program(asd_tree_t *head) {
+    if (!head->code || !head->code->instructions) return;
+
     for (int i = 0; i < head->code->size; i++) {
-        printf("%s", OperationToString(head->code->instructions[i].operation));
-        for (int j = 0; j < head->code->instructions[i].num_operands; j++) {
-            printf("%s", head->code->instructions[i].operands[j].operand.registerName);
-        }
+        print_instruction(&head->code->instructions[i]);
+    }
+}
+
+
+const char* OperationToString(iloc_operation_t op) {
+    switch (op) {
+        case add:     return "add";
+        case sub:     return "sub";
+        case mul:     return "mul";
+        case divi:    return "div";
+        case ge:      return "ge";
+        case gt:      return "gt";
+        case le:      return "le";
+        case lt:      return "lt";
+        case and:     return "and";
+        case or:      return "or";
+        case cmp_ne:  return "cmp_ne";
+        case cmp_eq:  return "cmp_eq";
+        case cbr:     return "cbr";
+        case loadI:   return "loadI";
+        case label:   return "label";
+        case nop:     return "nop";
+        default:      return "nop";
     }
 }

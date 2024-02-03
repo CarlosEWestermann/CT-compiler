@@ -46,10 +46,9 @@ extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
 #line 9 "parser.y"
- #include "AST_functions.h"
-                 #include "code_generation_functions.h" 
+ #include "AST_functions.h" 
 
-#line 53 "parser.tab.h"
+#line 52 "parser.tab.h"
 
 /* Token kinds.  */
 #ifndef YYTOKENTYPE
@@ -88,13 +87,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 24 "parser.y"
+#line 23 "parser.y"
 
     lexical_value_t lexical_value;
     asd_tree_t *tree;
     SymbolType type;
 
-#line 98 "parser.tab.h"
+#line 97 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

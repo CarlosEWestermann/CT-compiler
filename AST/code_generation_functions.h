@@ -32,46 +32,21 @@ typedef enum {
     cbr,
     loadI,
     label,
+    nop,
 } iloc_operation_t;
 
-const char* OperationToString(iloc_operation_t op) {
-    switch (op) {
-        case add:     return "add";
-        case sub:     return "sub";
-        case mul:     return "mul";
-        case divi:    return "div";
-        case ge:      return "ge";
-        case gt:      return "gt";
-        case le:      return "le";
-        case lt:      return "lt";
-        case and:     return "and";
-        case or:      return "or";
-        case cmp_ne:  return "cmp_ne";
-        case cmp_eq:  return "cmp_eq";
-        case cbr:     return "cbr";
-        case loadI:   return "loadI";
-        case label:   return "label";
-        default:      return "UNKNOWN";
-    }
-}
+const char* OperationToString(iloc_operation_t op);
 
 typedef enum {
     REGISTER, LABEL
 } operand_type_t;
 
 typedef struct {
-    operand_type_t type;
-    union {
-        char* label;
-        char* registerName;
-    } operand;
-} operand_t;
-
-
-
-typedef struct {
     iloc_operation_t operation;
-    operand_t* operands; 
+    char* label;
+    char* operand1;
+    char* operand2; 
+    char* operand3; 
     int num_operands; 
 } instruction_t;
 
@@ -87,7 +62,7 @@ typedef struct asd_tree {
     int number_of_children;
     struct asd_tree **children;
     struct asd_tree *next;
-    int temp;
+    char* temp;
     int offset;
     bool is_global;
     program_t *code;
@@ -95,13 +70,16 @@ typedef struct asd_tree {
 
 char* generate_label();
 char* generate_register();
-instruction_t create_instruction(iloc_operation_t operation, operand_t operands[], int num_operands);
+void append_program(program_t *destination, program_t *source);
+instruction_t create_instruction(iloc_operation_t operation, char* operand1, char* operand2, char* operand3, char* label, int num_operands);
 void free_instruction(instruction_t* instruction);
 void add_instruction_to_program(program_t *program, instruction_t instruction);
 void add_binop(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression, iloc_operation_t operation);
 void add_unop(asd_tree_t *head, asd_tree_t *first_expression, iloc_operation_t operation);
 void add_if(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *body);
 void add_if_else(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *if_body, asd_tree_t *else_body); 
+void print_instruction(instruction_t* instr);
 void print_program(asd_tree_t *head);
+const char* OperationToString(iloc_operation_t op);
 
 #endif

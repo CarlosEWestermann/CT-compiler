@@ -73,7 +73,7 @@
 
 
 /* First part of user prologue.  */
-#line 11 "parser.y"
+#line 10 "parser.y"
 
     int yylex(void);
     void yyerror (char const *mensagem);
@@ -569,14 +569,14 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    69,    69,    73,    74,    85,    87,    89,    90,    92,
-     108,   109,   110,   112,   127,   142,   145,   148,   152,   153,
-     155,   158,   159,   161,   162,   176,   177,   178,   179,   180,
-     181,   182,   184,   185,   188,   203,   215,   230,   246,   247,
-     249,   251,   254,   260,   269,   274,   276,   277,   284,   285,
-     292,   293,   300,   307,   308,   315,   322,   329,   336,   337,
-     344,   351,   352,   359,   366,   371,   372,   376,   380,   394,
-     395,   396,   397,   398,   399
+       0,    68,    68,    72,    73,    84,    86,    88,    89,    91,
+     107,   108,   109,   111,   126,   141,   145,   148,   152,   153,
+     155,   158,   159,   161,   162,   177,   178,   179,   180,   181,
+     182,   183,   185,   186,   189,   204,   216,   231,   247,   248,
+     250,   252,   255,   261,   270,   275,   277,   278,   285,   286,
+     293,   294,   301,   308,   309,   316,   323,   330,   337,   338,
+     347,   354,   355,   362,   369,   374,   375,   379,   383,   397,
+     405,   406,   407,   408,   409
 };
 #endif
 
@@ -1505,7 +1505,7 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* program: push_scope init pop_scope  */
-#line 69 "parser.y"
+#line 68 "parser.y"
                                    {
     (yyval.tree) = (yyvsp[-1].tree);
 }
@@ -1513,13 +1513,13 @@ yyreduce:
     break;
 
   case 3: /* init: %empty  */
-#line 73 "parser.y"
+#line 72 "parser.y"
                   { (yyval.tree) = NULL; }
 #line 1519 "parser.tab.c"
     break;
 
   case 4: /* init: element init  */
-#line 74 "parser.y"
+#line 73 "parser.y"
                     {
                         if((yyvsp[-1].tree) != NULL) {
                             (yyval.tree) = (yyvsp[-1].tree); 
@@ -1534,31 +1534,31 @@ yyreduce:
     break;
 
   case 5: /* push_scope: %empty  */
-#line 85 "parser.y"
+#line 84 "parser.y"
             { pushScope(&stack); }
 #line 1540 "parser.tab.c"
     break;
 
   case 6: /* pop_scope: %empty  */
-#line 87 "parser.y"
+#line 86 "parser.y"
            { popScope(&stack); }
 #line 1546 "parser.tab.c"
     break;
 
   case 7: /* element: function  */
-#line 89 "parser.y"
+#line 88 "parser.y"
                   { (yyval.tree) = (yyvsp[0].tree); }
 #line 1552 "parser.tab.c"
     break;
 
   case 8: /* element: global_declaration  */
-#line 90 "parser.y"
+#line 89 "parser.y"
                          { (yyval.tree) = (yyvsp[0].tree); }
 #line 1558 "parser.tab.c"
     break;
 
   case 9: /* global_declaration: type list_vars ';'  */
-#line 92 "parser.y"
+#line 91 "parser.y"
                                        { 
     (yyval.tree) = (yyvsp[-1].tree); 
     int i = 0;
@@ -1578,25 +1578,25 @@ yyreduce:
     break;
 
   case 10: /* type: TK_PR_INT  */
-#line 108 "parser.y"
+#line 107 "parser.y"
                 { (yyval.type) = INT; }
 #line 1584 "parser.tab.c"
     break;
 
   case 11: /* type: TK_PR_FLOAT  */
-#line 109 "parser.y"
+#line 108 "parser.y"
                   { (yyval.type) = FLOAT; }
 #line 1590 "parser.tab.c"
     break;
 
   case 12: /* type: TK_PR_BOOL  */
-#line 110 "parser.y"
+#line 109 "parser.y"
                  { (yyval.type) = BOOL; }
 #line 1596 "parser.tab.c"
     break;
 
   case 13: /* list_vars: TK_IDENTIFICADOR  */
-#line 112 "parser.y"
+#line 111 "parser.y"
                             {   (yyval.tree) = NULL; 
                                 int i = 0;
                                 while(varList[i] != NULL){
@@ -1616,7 +1616,7 @@ yyreduce:
     break;
 
   case 14: /* list_vars: list_vars ',' TK_IDENTIFICADOR  */
-#line 127 "parser.y"
+#line 126 "parser.y"
                                          { (yyval.tree) = (yyvsp[-2].tree); 
                                             int i = 0;
                                             while(varList[i] != NULL){
@@ -1635,10 +1635,11 @@ yyreduce:
     break;
 
   case 15: /* function: push_scope header no_scope_body pop_scope  */
-#line 142 "parser.y"
+#line 141 "parser.y"
                                                     { (yyval.tree) = (yyvsp[-2].tree); 
-                                                      asd_add_child((yyval.tree), (yyvsp[-1].tree)); }
-#line 1642 "parser.tab.c"
+                                                      asd_add_child((yyval.tree), (yyvsp[-1].tree));
+                                                      append_program((yyval.tree)->code, (yyvsp[-1].tree)->code); }
+#line 1643 "parser.tab.c"
     break;
 
   case 16: /* header: '(' param_list ')' TK_OC_GE type '!' TK_IDENTIFICADOR  */
@@ -1646,7 +1647,7 @@ yyreduce:
                                                               { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); 
                                                                 insertSymbolGlobal(&stack, (yyvsp[0].lexical_value).token_value, (yyvsp[0].lexical_value).lineno, FUNCTION, (yyvsp[-2].type), "");
                                                                 free((yyvsp[0].lexical_value).token_value);}
-#line 1650 "parser.tab.c"
+#line 1651 "parser.tab.c"
     break;
 
   case 17: /* header: '(' ')' TK_OC_GE type '!' TK_IDENTIFICADOR  */
@@ -1654,44 +1655,44 @@ yyreduce:
                                                      { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); 
                                                        insertSymbolGlobal(&stack, (yyvsp[0].lexical_value).token_value, (yyvsp[0].lexical_value).lineno, FUNCTION, (yyvsp[-2].type), ""); 
                                                        free((yyvsp[0].lexical_value).token_value); }
-#line 1658 "parser.tab.c"
+#line 1659 "parser.tab.c"
     break;
 
   case 18: /* param_list: param  */
 #line 152 "parser.y"
                   {  }
-#line 1664 "parser.tab.c"
+#line 1665 "parser.tab.c"
     break;
 
   case 19: /* param_list: param_list ',' param  */
 #line 153 "parser.y"
                                    {  }
-#line 1670 "parser.tab.c"
+#line 1671 "parser.tab.c"
     break;
 
   case 20: /* param: type TK_IDENTIFICADOR  */
 #line 155 "parser.y"
                              { insertSymbolWithScope(&stack, (yyvsp[0].lexical_value).token_value, (yyvsp[0].lexical_value).lineno, IDENTIFIER, (yyvsp[-1].type), "");
                                free((yyvsp[0].lexical_value).token_value); }
-#line 1677 "parser.tab.c"
+#line 1678 "parser.tab.c"
     break;
 
   case 21: /* no_scope_body: '{' '}'  */
 #line 158 "parser.y"
                        { (yyval.tree) = NULL; }
-#line 1683 "parser.tab.c"
+#line 1684 "parser.tab.c"
     break;
 
   case 22: /* no_scope_body: '{' command_list '}'  */
 #line 159 "parser.y"
                              { (yyval.tree) = (yyvsp[-1].tree); }
-#line 1689 "parser.tab.c"
+#line 1690 "parser.tab.c"
     break;
 
   case 23: /* command_list: command  */
 #line 161 "parser.y"
                       { (yyval.tree) = (yyvsp[0].tree); }
-#line 1695 "parser.tab.c"
+#line 1696 "parser.tab.c"
     break;
 
   case 24: /* command_list: command command_list  */
@@ -1704,68 +1705,69 @@ yyreduce:
                                             (yyval.tree) = (yyval.tree)->next;
                                         }
                                         asd_add_child((yyval.tree), (yyvsp[0].tree));
+                                        append_program((yyval.tree)->code, (yyvsp[0].tree)->code);
                                         (yyval.tree)->next=(yyvsp[0].tree);
                                         (yyval.tree) = (yyvsp[-1].tree);
                                     };}
-#line 1711 "parser.tab.c"
+#line 1713 "parser.tab.c"
     break;
 
   case 25: /* command: local_var_dec ';'  */
-#line 176 "parser.y"
+#line 177 "parser.y"
                            { (yyval.tree) = (yyvsp[-1].tree); }
-#line 1717 "parser.tab.c"
+#line 1719 "parser.tab.c"
     break;
 
   case 26: /* command: attrib ';'  */
-#line 177 "parser.y"
+#line 178 "parser.y"
                      { (yyval.tree) = (yyvsp[-1].tree); }
-#line 1723 "parser.tab.c"
+#line 1725 "parser.tab.c"
     break;
 
   case 27: /* command: conditional ';'  */
-#line 178 "parser.y"
+#line 179 "parser.y"
                           { (yyval.tree) = (yyvsp[-1].tree); }
-#line 1729 "parser.tab.c"
+#line 1731 "parser.tab.c"
     break;
 
   case 28: /* command: while ';'  */
-#line 179 "parser.y"
+#line 180 "parser.y"
                     { (yyval.tree) = (yyvsp[-1].tree); }
-#line 1735 "parser.tab.c"
+#line 1737 "parser.tab.c"
     break;
 
   case 29: /* command: return ';'  */
-#line 180 "parser.y"
+#line 181 "parser.y"
                      { (yyval.tree) = (yyvsp[-1].tree); }
-#line 1741 "parser.tab.c"
+#line 1743 "parser.tab.c"
     break;
 
   case 30: /* command: function_call ';'  */
-#line 181 "parser.y"
+#line 182 "parser.y"
                             { (yyval.tree) = (yyvsp[-1].tree); }
-#line 1747 "parser.tab.c"
+#line 1749 "parser.tab.c"
     break;
 
   case 31: /* command: open_block  */
-#line 182 "parser.y"
+#line 183 "parser.y"
                      { (yyval.tree) = (yyvsp[0].tree); }
-#line 1753 "parser.tab.c"
+#line 1755 "parser.tab.c"
     break;
 
   case 32: /* open_block: '{' '}' ';'  */
-#line 184 "parser.y"
+#line 185 "parser.y"
                       { (yyval.tree) = NULL; }
-#line 1759 "parser.tab.c"
+#line 1761 "parser.tab.c"
     break;
 
   case 33: /* open_block: '{' push_scope command_list pop_scope '}' ';'  */
-#line 185 "parser.y"
+#line 186 "parser.y"
                                                            { (yyval.tree) = (yyvsp[-3].tree); }
-#line 1765 "parser.tab.c"
+#line 1767 "parser.tab.c"
     break;
 
   case 34: /* local_var_dec: type list_vars  */
-#line 188 "parser.y"
+#line 189 "parser.y"
                               { 
     (yyval.tree) = (yyvsp[0].tree); 
     int i = 0;
@@ -1780,13 +1782,13 @@ yyreduce:
             lineList[i] = -1;
         }
     } }
-#line 1784 "parser.tab.c"
+#line 1786 "parser.tab.c"
     break;
 
   case 35: /* attrib: TK_IDENTIFICADOR '=' expr  */
-#line 203 "parser.y"
+#line 204 "parser.y"
                                   { (yyval.tree) = asd_new("="); 
-                                    asd_add_child((yyval.tree), asd_new((yyvsp[-2].lexical_value).token_value)); 
+                                    asd_add_child((yyval.tree), asd_new((yyvsp[-2].lexical_value).token_value));
                                     asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                     SymbolData *var = lookupSymbolWhenUsed(&stack, (yyvsp[-2].lexical_value).token_value, (yyvsp[-2].lexical_value).lineno, IDENTIFIER, (yyvsp[-2].lexical_value).token_type, "");
                                     if(var->nature == FUNCTION){
@@ -1796,11 +1798,11 @@ yyreduce:
                                     (yyval.tree)->type = var->type;
                                     free((yyvsp[-2].lexical_value).token_value);
                                     }
-#line 1800 "parser.tab.c"
+#line 1802 "parser.tab.c"
     break;
 
   case 36: /* function_call: TK_IDENTIFICADOR '(' arg_list ')'  */
-#line 215 "parser.y"
+#line 216 "parser.y"
                                                  { 
                     char *buffer = malloc((strlen("call ") + strlen((yyvsp[-3].lexical_value).token_value) + 1)* sizeof(char));
                     strcpy(buffer, "call ");
@@ -1816,11 +1818,11 @@ yyreduce:
                     (yyval.tree)->type = var->type; 
                     free((yyvsp[-3].lexical_value).token_value);
                     }
-#line 1820 "parser.tab.c"
+#line 1822 "parser.tab.c"
     break;
 
   case 37: /* function_call: TK_IDENTIFICADOR '(' ')'  */
-#line 230 "parser.y"
+#line 231 "parser.y"
                                            { 
                         char *buffer = malloc((strlen("call ") + strlen((yyvsp[-2].lexical_value).token_value) + 1)* sizeof(char));
                         strcpy(buffer, "call ");
@@ -1835,271 +1837,273 @@ yyreduce:
                         (yyval.tree)->type = var->type; 
                         free((yyvsp[-2].lexical_value).token_value);
                     }
-#line 1839 "parser.tab.c"
+#line 1841 "parser.tab.c"
     break;
 
   case 38: /* arg_list: arg  */
-#line 246 "parser.y"
+#line 247 "parser.y"
               { (yyval.tree) = (yyvsp[0].tree); }
-#line 1845 "parser.tab.c"
+#line 1847 "parser.tab.c"
     break;
 
   case 39: /* arg_list: arg ',' arg_list  */
-#line 247 "parser.y"
-                       { (yyval.tree) = (yyvsp[-2].tree); asd_add_child((yyval.tree), (yyvsp[0].tree)); }
-#line 1851 "parser.tab.c"
+#line 248 "parser.y"
+                       { (yyval.tree) = (yyvsp[-2].tree); asd_add_child((yyval.tree), (yyvsp[0].tree)); append_program((yyval.tree)->code, (yyvsp[0].tree)->code); }
+#line 1853 "parser.tab.c"
     break;
 
   case 40: /* arg: expr  */
-#line 249 "parser.y"
+#line 250 "parser.y"
           { (yyval.tree) = (yyvsp[0].tree); }
-#line 1857 "parser.tab.c"
+#line 1859 "parser.tab.c"
     break;
 
   case 41: /* return: TK_PR_RETURN expr  */
-#line 251 "parser.y"
+#line 252 "parser.y"
                           { (yyval.tree) = asd_new("return");
                             asd_add_child((yyval.tree), (yyvsp[0].tree)); (yyval.tree)->type = (yyvsp[0].tree)->type; }
-#line 1864 "parser.tab.c"
+#line 1866 "parser.tab.c"
     break;
 
   case 42: /* conditional: TK_PR_IF '(' expr ')' no_scope_body  */
-#line 254 "parser.y"
+#line 255 "parser.y"
                                                  { (yyval.tree) = asd_new("if"); 
                                                    asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                                    asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                                    (yyval.tree)->type = (yyvsp[-2].tree)->type; 
                                                    add_if((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree)); }
-#line 1874 "parser.tab.c"
+#line 1876 "parser.tab.c"
     break;
 
   case 43: /* conditional: TK_PR_IF '(' expr ')' no_scope_body TK_PR_ELSE no_scope_body  */
-#line 260 "parser.y"
+#line 261 "parser.y"
                                                                             { (yyval.tree) = asd_new("if"); 
                                                                               asd_add_child((yyval.tree), (yyvsp[-4].tree)); 
                                                                               asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                                                               asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                                                               (yyval.tree)->type = (yyvsp[-4].tree)->type;
                                                                               add_if_else((yyval.tree), (yyvsp[-4].tree), (yyvsp[-2].tree), (yyvsp[0].tree)); }
-#line 1885 "parser.tab.c"
+#line 1887 "parser.tab.c"
     break;
 
   case 44: /* while: TK_PR_WHILE '(' expr ')' no_scope_body  */
-#line 269 "parser.y"
+#line 270 "parser.y"
                                               { (yyval.tree) = asd_new("while"); 
                                                 asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                                 asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                                 (yyval.tree)->type = (yyvsp[-2].tree)->type;}
-#line 1894 "parser.tab.c"
+#line 1896 "parser.tab.c"
     break;
 
   case 45: /* expr: logical_or_expr  */
-#line 274 "parser.y"
+#line 275 "parser.y"
                       { (yyval.tree) = (yyvsp[0].tree); }
-#line 1900 "parser.tab.c"
+#line 1902 "parser.tab.c"
     break;
 
   case 46: /* logical_or_expr: logical_and_expr  */
-#line 276 "parser.y"
+#line 277 "parser.y"
                                   { (yyval.tree) = (yyvsp[0].tree); }
-#line 1906 "parser.tab.c"
+#line 1908 "parser.tab.c"
     break;
 
   case 47: /* logical_or_expr: logical_or_expr TK_OC_OR logical_and_expr  */
-#line 277 "parser.y"
+#line 278 "parser.y"
                                                 {(yyval.tree) = asd_new("|"); 
                                                 asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                                 asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                                 (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
                                                 add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), or); 
                                                 }
-#line 1917 "parser.tab.c"
+#line 1919 "parser.tab.c"
     break;
 
   case 48: /* logical_and_expr: equality_expr  */
-#line 284 "parser.y"
+#line 285 "parser.y"
                                 { (yyval.tree) = (yyvsp[0].tree); }
-#line 1923 "parser.tab.c"
+#line 1925 "parser.tab.c"
     break;
 
   case 49: /* logical_and_expr: logical_and_expr TK_OC_AND equality_expr  */
-#line 285 "parser.y"
+#line 286 "parser.y"
                                                { (yyval.tree) = asd_new("&"); 
                                                  asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                                  asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                                  (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
                                                  add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), and); 
                                                  }
-#line 1934 "parser.tab.c"
+#line 1936 "parser.tab.c"
     break;
 
   case 50: /* equality_expr: relational_expr  */
-#line 292 "parser.y"
+#line 293 "parser.y"
                                { (yyval.tree) = (yyvsp[0].tree); }
-#line 1940 "parser.tab.c"
+#line 1942 "parser.tab.c"
     break;
 
   case 51: /* equality_expr: equality_expr TK_OC_EQ relational_expr  */
-#line 293 "parser.y"
+#line 294 "parser.y"
                                              { (yyval.tree) = asd_new("=="); 
                                                asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                                asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                                (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
                                                add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), cmp_eq); 
                                                }
-#line 1951 "parser.tab.c"
+#line 1953 "parser.tab.c"
     break;
 
   case 52: /* equality_expr: equality_expr TK_OC_NE relational_expr  */
-#line 300 "parser.y"
+#line 301 "parser.y"
                                              { (yyval.tree) = asd_new("!="); 
                                                asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                                asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                                (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
                                                add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), cmp_ne);
                                                }
-#line 1962 "parser.tab.c"
+#line 1964 "parser.tab.c"
     break;
 
   case 53: /* relational_expr: add_sub_expr  */
-#line 307 "parser.y"
+#line 308 "parser.y"
                               { (yyval.tree) = (yyvsp[0].tree); }
-#line 1968 "parser.tab.c"
+#line 1970 "parser.tab.c"
     break;
 
   case 54: /* relational_expr: relational_expr '<' add_sub_expr  */
-#line 308 "parser.y"
+#line 309 "parser.y"
                                        { (yyval.tree) = asd_new("<"); 
                                          asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                          asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                          (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
                                          add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), lt);
                                           }
-#line 1979 "parser.tab.c"
+#line 1981 "parser.tab.c"
     break;
 
   case 55: /* relational_expr: relational_expr '>' add_sub_expr  */
-#line 315 "parser.y"
+#line 316 "parser.y"
                                        { (yyval.tree) = asd_new(">"); 
                                          asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                          asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                          (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
                                          add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), gt);
                                          }
-#line 1990 "parser.tab.c"
+#line 1992 "parser.tab.c"
     break;
 
   case 56: /* relational_expr: relational_expr TK_OC_LE add_sub_expr  */
-#line 322 "parser.y"
+#line 323 "parser.y"
                                             { (yyval.tree) = asd_new("<="); 
                                               asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                               asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                               (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
                                               add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), le);
                                               }
-#line 2001 "parser.tab.c"
+#line 2003 "parser.tab.c"
     break;
 
   case 57: /* relational_expr: relational_expr TK_OC_GE add_sub_expr  */
-#line 329 "parser.y"
+#line 330 "parser.y"
                                             { (yyval.tree) = asd_new(">="); 
                                               asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                               asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                               (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
                                               add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), ge);
                                               }
-#line 2012 "parser.tab.c"
+#line 2014 "parser.tab.c"
     break;
 
   case 58: /* add_sub_expr: mult_div_mod_expr  */
-#line 336 "parser.y"
+#line 337 "parser.y"
                                 { (yyval.tree) = (yyvsp[0].tree); }
-#line 2018 "parser.tab.c"
+#line 2020 "parser.tab.c"
     break;
 
   case 59: /* add_sub_expr: add_sub_expr '+' mult_div_mod_expr  */
-#line 337 "parser.y"
+#line 338 "parser.y"
                                          { (yyval.tree) = asd_new("+"); 
                                            asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
+                                           //append_program($$->code, $1->code);
                                            asd_add_child((yyval.tree), (yyvsp[0].tree)); 
+                                           //append_program($$->code, $3->code);
                                            (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
                                            add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), add);
                                            }
-#line 2029 "parser.tab.c"
+#line 2033 "parser.tab.c"
     break;
 
   case 60: /* add_sub_expr: add_sub_expr '-' mult_div_mod_expr  */
-#line 344 "parser.y"
+#line 347 "parser.y"
                                          { (yyval.tree) = asd_new("-"); 
                                            asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                            asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                            (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
                                            add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), sub);
                                             }
-#line 2040 "parser.tab.c"
+#line 2044 "parser.tab.c"
     break;
 
   case 61: /* mult_div_mod_expr: unary_expr  */
-#line 351 "parser.y"
+#line 354 "parser.y"
                               { (yyval.tree) = (yyvsp[0].tree); }
-#line 2046 "parser.tab.c"
+#line 2050 "parser.tab.c"
     break;
 
   case 62: /* mult_div_mod_expr: mult_div_mod_expr '*' unary_expr  */
-#line 352 "parser.y"
+#line 355 "parser.y"
                                        { (yyval.tree) = asd_new("*"); 
                                          asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                          asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                          (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
                                          add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), mul);
                                          }
-#line 2057 "parser.tab.c"
+#line 2061 "parser.tab.c"
     break;
 
   case 63: /* mult_div_mod_expr: mult_div_mod_expr '/' unary_expr  */
-#line 359 "parser.y"
+#line 362 "parser.y"
                                        { (yyval.tree) = asd_new("/"); 
                                          asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                          asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                          (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);
                                          add_binop((yyval.tree), (yyvsp[-2].tree), (yyvsp[0].tree), divi); 
                                          }
-#line 2068 "parser.tab.c"
+#line 2072 "parser.tab.c"
     break;
 
   case 64: /* mult_div_mod_expr: mult_div_mod_expr '%' unary_expr  */
-#line 366 "parser.y"
+#line 369 "parser.y"
                                        { (yyval.tree) = asd_new("%"); 
                                          asd_add_child((yyval.tree), (yyvsp[-2].tree)); 
                                          asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                          (yyval.tree)->type = inferType((yyvsp[-2].tree)->type, (yyvsp[0].tree)->type);}
-#line 2077 "parser.tab.c"
+#line 2081 "parser.tab.c"
     break;
 
   case 65: /* unary_expr: primary_expr  */
-#line 371 "parser.y"
+#line 374 "parser.y"
                          { (yyval.tree) = (yyvsp[0].tree); }
-#line 2083 "parser.tab.c"
+#line 2087 "parser.tab.c"
     break;
 
   case 66: /* unary_expr: '-' unary_expr  */
-#line 372 "parser.y"
+#line 375 "parser.y"
                                       { (yyval.tree) = asd_new("-"); 
                                         asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                                         (yyval.tree)->type = (yyvsp[0].tree)->type; }
-#line 2091 "parser.tab.c"
+#line 2095 "parser.tab.c"
     break;
 
   case 67: /* unary_expr: '!' unary_expr  */
-#line 376 "parser.y"
+#line 379 "parser.y"
                          { (yyval.tree) = asd_new("!"); 
                            asd_add_child((yyval.tree), (yyvsp[0].tree)); 
                            (yyval.tree)->type = (yyvsp[0].tree)->type; }
-#line 2099 "parser.tab.c"
+#line 2103 "parser.tab.c"
     break;
 
   case 68: /* primary_expr: TK_IDENTIFICADOR  */
-#line 380 "parser.y"
+#line 383 "parser.y"
                                { 
         (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value);     
         SymbolData *var = lookupSymbolWhenUsed(&stack, (yyvsp[0].lexical_value).token_value, (yyvsp[0].lexical_value).lineno, IDENTIFIER, (yyvsp[0].lexical_value).token_type, "");
@@ -2114,47 +2118,54 @@ yyreduce:
         //$$->temp = rx;
         free((yyvsp[0].lexical_value).token_value); 
         }
-#line 2118 "parser.tab.c"
+#line 2122 "parser.tab.c"
     break;
 
   case 69: /* primary_expr: TK_LIT_INT  */
-#line 394 "parser.y"
-                 { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); free((yyvsp[0].lexical_value).token_value); (yyval.tree)->type = INT; }
-#line 2124 "parser.tab.c"
+#line 397 "parser.y"
+                 { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value);  (yyval.tree)->type = INT; 
+                    char* temp_register = generate_register();
+  
+    add_instruction_to_program((yyval.tree)->code, create_instruction(loadI, temp_register, (yyvsp[0].lexical_value).token_value, NULL, NULL, 2));
+    (yyval.tree)->temp = temp_register;
+    free((yyvsp[0].lexical_value).token_value);
+    //free(temp_register);
+    }
+#line 2135 "parser.tab.c"
     break;
 
   case 70: /* primary_expr: TK_LIT_FLOAT  */
-#line 395 "parser.y"
+#line 405 "parser.y"
                    { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); free((yyvsp[0].lexical_value).token_value); (yyval.tree)->type = FLOAT; }
-#line 2130 "parser.tab.c"
+#line 2141 "parser.tab.c"
     break;
 
   case 71: /* primary_expr: TK_LIT_TRUE  */
-#line 396 "parser.y"
+#line 406 "parser.y"
                   { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); free((yyvsp[0].lexical_value).token_value); (yyval.tree)->type = BOOL; }
-#line 2136 "parser.tab.c"
+#line 2147 "parser.tab.c"
     break;
 
   case 72: /* primary_expr: TK_LIT_FALSE  */
-#line 397 "parser.y"
+#line 407 "parser.y"
                    { (yyval.tree) = asd_new((yyvsp[0].lexical_value).token_value); free((yyvsp[0].lexical_value).token_value); (yyval.tree)->type = BOOL; }
-#line 2142 "parser.tab.c"
+#line 2153 "parser.tab.c"
     break;
 
   case 73: /* primary_expr: function_call  */
-#line 398 "parser.y"
+#line 408 "parser.y"
                     { (yyval.tree) = (yyvsp[0].tree); }
-#line 2148 "parser.tab.c"
+#line 2159 "parser.tab.c"
     break;
 
   case 74: /* primary_expr: '(' expr ')'  */
-#line 399 "parser.y"
+#line 409 "parser.y"
                    { (yyval.tree) = (yyvsp[-1].tree); }
-#line 2154 "parser.tab.c"
+#line 2165 "parser.tab.c"
     break;
 
 
-#line 2158 "parser.tab.c"
+#line 2169 "parser.tab.c"
 
       default: break;
     }
@@ -2378,4 +2389,4 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 401 "parser.y"
+#line 411 "parser.y"

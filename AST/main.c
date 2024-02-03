@@ -17,8 +17,8 @@ int main (int argc, char **argv)
 {
     stack.top = -1;
     int ret = yyparse(); 
-    exporta (arvore);
     print_program (arvore);
+    exporta (arvore);
     yylex_destroy();
     return ret;
 }
