@@ -40,7 +40,7 @@ void insertSymbol(SymbolTable* table, const char* key, int line, SymbolNature na
     newEntry->content.nature = nature;
     newEntry->content.type = type;
     newEntry->content.is_global = is_global;
-    newEntry->content.memory_offset = is_global ? generate_global_offset() : generate_local_offset;
+    newEntry->content.memory_offset = is_global ? generate_global_offset() : generate_local_offset();
     strcpy(newEntry->content.value, value);
     newEntry->next = NULL;
 

@@ -34,6 +34,27 @@ typedef enum {
     label,
 } iloc_operation_t;
 
+const char* OperationToString(iloc_operation_t op) {
+    switch (op) {
+        case add:     return "add";
+        case sub:     return "sub";
+        case mul:     return "mul";
+        case divi:    return "div";
+        case ge:      return "ge";
+        case gt:      return "gt";
+        case le:      return "le";
+        case lt:      return "lt";
+        case and:     return "and";
+        case or:      return "or";
+        case cmp_ne:  return "cmp_ne";
+        case cmp_eq:  return "cmp_eq";
+        case cbr:     return "cbr";
+        case loadI:   return "loadI";
+        case label:   return "label";
+        default:      return "UNKNOWN";
+    }
+}
+
 typedef enum {
     REGISTER, LABEL
 } operand_type_t;
@@ -45,6 +66,8 @@ typedef struct {
         char* registerName;
     } operand;
 } operand_t;
+
+
 
 typedef struct {
     iloc_operation_t operation;
@@ -79,5 +102,6 @@ void add_binop(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *secon
 void add_unop(asd_tree_t *head, asd_tree_t *first_expression, iloc_operation_t operation);
 void add_if(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *body);
 void add_if_else(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *if_body, asd_tree_t *else_body); 
+void print_program(asd_tree_t *head);
 
 #endif
