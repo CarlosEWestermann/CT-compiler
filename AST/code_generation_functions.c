@@ -144,21 +144,26 @@ void add_while(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *body) {
     char* label_true = generate_label();
     char* label_false = generate_label();
 
-    append_program(head->code, expression->code);
+    if(expression != NULL && expression->code->size != 0) { 
+        expression->code->instructions[0].label = label_while; 
+        append_program(head->code, expression->code);
+    } else {
+        add_instruction_to_program(head->code, create_instruction(nop, NULL, NULL, NULL, label_true, 0));
+    }
 
     add_instruction_to_program(head->code, create_instruction(loadI, "0", zero_register, NULL, NULL, 2));
 
-    add_instruction_to_program(head->code, create_instruction(cmp_ne, zero_register, expression->temp, comparison_register, label_while, 3));
+    add_instruction_to_program(head->code, create_instruction(cmp_ne, zero_register, expression->temp, comparison_register, NULL, 3));
 
     add_instruction_to_program(head->code, create_instruction(cbr, comparison_register, label_true, label_false, NULL, 3));
 
     if(body != NULL && body->code->size != 0) { 
         body->code->instructions[0].label = label_true; 
         append_program(head->code, body->code);
-        add_instruction_to_program(head->code, create_instruction(jumpI, label_while, NULL, NULL, NULL, 1));
     } else {
         add_instruction_to_program(head->code, create_instruction(nop, NULL, NULL, NULL, label_true, 0));
     }
+    add_instruction_to_program(head->code, create_instruction(jumpI, label_while, NULL, NULL, NULL, 1));
 
 
     add_instruction_to_program(head->code, create_instruction(nop, NULL, NULL, NULL, label_false, 0));
