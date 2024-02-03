@@ -8,6 +8,7 @@
         "utility": "c",
         "system_error": "c",
         "stdbool.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "symbol_table.h": "c"
     }
 }

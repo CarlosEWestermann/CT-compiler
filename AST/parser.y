@@ -250,7 +250,9 @@ arg_list: arg { $$ = $1; }
 arg: expr { $$ = $1; };
 
 return: TK_PR_RETURN expr { $$ = asd_new("return");
-                            asd_add_child($$, $2); $$->type = $2->type; };
+                            asd_add_child($$, $2); 
+                            $$->type = $2->type; 
+                            append_program($$->code, $2->code);};
 
 conditional: TK_PR_IF '(' expr ')' no_scope_body { $$ = asd_new("if"); 
                                                    asd_add_child($$, $3); 
@@ -391,7 +393,7 @@ primary_expr: TK_IDENTIFICADOR {
         $$->offset = var->memory_offset;
         $$->is_global = var->is_global;
         char* temp_register = generate_register();
-        char[80] temp_offset;
+        char temp_offset[80];
         sprintf(temp_offset, "%i", $$->offset);
         add_instruction_to_program($$->code, create_instruction(loadAI, $$->is_global ? "rbss" : "rfp", temp_offset, temp_register, NULL, 3));
         $$->temp = temp_register;
