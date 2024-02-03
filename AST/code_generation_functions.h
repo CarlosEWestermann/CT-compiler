@@ -30,6 +30,7 @@ typedef enum {
     cmp_ne,
     cmp_eq,
     cbr,
+    loadAI,
     loadI,
     label,
     nop,

@@ -144,6 +144,7 @@ void print_instruction(instruction_t* instr) {
         case cmp_eq:
         case ge:
         case gt:
+        case loadAI:
         case le:
         case lt:
             if (instr->operand1) printf("%s, ", instr->operand1);
@@ -154,9 +155,11 @@ void print_instruction(instruction_t* instr) {
             if (instr->operand1) printf("%s, ", instr->operand1);
             if (instr->operand2) printf("=> %s, ", instr->operand2);
             if (instr->operand3) printf("%s", instr->operand3);
+            break;
         case loadI:
             if (instr->operand1) printf("%s =>", instr->operand1);
             if (instr->operand1) printf("%s ", instr->operand2);
+            break;
         default:
             printf("nop");
     }
@@ -188,6 +191,7 @@ const char* OperationToString(iloc_operation_t op) {
         case cmp_ne:  return "cmp_ne";
         case cmp_eq:  return "cmp_eq";
         case cbr:     return "cbr";
+        case loadAI:  return "loadAI";
         case loadI:   return "loadI";
         case label:   return "label";
         case nop:     return "nop";

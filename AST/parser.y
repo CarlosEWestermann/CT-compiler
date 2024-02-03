@@ -390,14 +390,17 @@ primary_expr: TK_IDENTIFICADOR {
         $$->type = var->type; 
         $$->offset = var->memory_offset;
         $$->is_global = var->is_global;
-        //$$->code = load rx => $$->offset, $$->is_global ? rbss : rfp;
-        //$$->temp = rx;
+        char* temp_register = generate_register();
+        char[80] temp_offset;
+        sprintf(temp_offset, "%i", $$->offset);
+        add_instruction_to_program($$->code, create_instruction(loadAI, $$->is_global ? "rbss" : "rfp", temp_offset, temp_register, NULL, 3));
+        $$->temp = temp_register;
         free($1.token_value); 
         }
     | TK_LIT_INT { $$ = asd_new($1.token_value);  $$->type = INT; 
                     char* temp_register = generate_register();
   
-    add_instruction_to_program($$->code, create_instruction(loadI, temp_register, $1.token_value, NULL, NULL, 2));
+    add_instruction_to_program($$->code, create_instruction(loadI, $1.token_value, temp_register, NULL, NULL, 2));
     $$->temp = temp_register;
     free($1.token_value);
     //free(temp_register);
