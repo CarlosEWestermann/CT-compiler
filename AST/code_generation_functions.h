@@ -33,6 +33,7 @@ typedef enum {
     loadAI,
     loadI,
     label,
+    jumpI,
     nop,
 } iloc_operation_t;
 
@@ -79,6 +80,7 @@ void add_binop(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *secon
 void add_unop(asd_tree_t *head, asd_tree_t *first_expression, iloc_operation_t operation);
 void add_if(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *body);
 void add_if_else(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *if_body, asd_tree_t *else_body); 
+void add_while(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *body);
 void print_instruction(instruction_t* instr);
 void print_program(asd_tree_t *head);
 const char* OperationToString(iloc_operation_t op);

@@ -271,7 +271,8 @@ conditional: TK_PR_IF '(' expr ')' no_scope_body { $$ = asd_new("if");
 
 while: TK_PR_WHILE '(' expr ')' no_scope_body { $$ = asd_new("while"); 
                                                 asd_add_child($$, $3); 
-                                                asd_add_child($$, $5); 
+                                                asd_add_child($$, $5);
+                                                add_while($$, $3, $5);
                                                 $$->type = $3->type;}
 
 expr: logical_or_expr { $$ = $1; };

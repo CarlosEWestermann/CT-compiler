@@ -62,8 +62,6 @@ void append_program(program_t *destination, program_t *source) {
     destination->size = newSize;
 }
 
-void add_while(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *body) { }
-
 void add_if(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *body) {
     char* zero_register = generate_register();
     char* comparison_register = generate_register();
@@ -78,7 +76,7 @@ void add_if(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *body) {
 
     add_instruction_to_program(head->code, create_instruction(cbr, comparison_register, label_true, label_false, NULL, 3));
 
-    if(body != NULL) { 
+    if(body != NULL && body->code->size != 0) { 
         body->code->instructions[0].label = label_true; 
         append_program(head->code, body->code);
     } else {
@@ -103,14 +101,14 @@ void add_if_else(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *if_body, 
 
     add_instruction_to_program(head->code, create_instruction(cbr, comparison_register, label_true, label_false, NULL, 3));
 
-    if(if_body != NULL) { 
+    if(if_body != NULL && if_body->code->size != 0) { 
         if_body->code->instructions[0].label = label_true; 
         append_program(head->code, if_body->code);
     } else {
         add_instruction_to_program(head->code, create_instruction(nop, NULL, NULL, NULL, label_true, 0));
     }
 
-    if(else_body != NULL) { 
+    if(else_body != NULL && else_body->code->size != 0) { 
         else_body->code->instructions[0].label = label_true; 
         append_program(head->code, else_body->code);
     } else {
@@ -139,9 +137,36 @@ void add_unop(asd_tree_t *head, asd_tree_t *first_expression, iloc_operation_t o
     head->temp = temp_register;
 }
 
+void add_while(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *body) {
+    char* zero_register = generate_register();
+    char* comparison_register = generate_register();
+    char* label_while = generate_label();
+    char* label_true = generate_label();
+    char* label_false = generate_label();
+
+    append_program(head->code, expression->code);
+
+    add_instruction_to_program(head->code, create_instruction(loadI, "0", zero_register, NULL, NULL, 2));
+
+    add_instruction_to_program(head->code, create_instruction(cmp_ne, zero_register, expression->temp, comparison_register, label_while, 3));
+
+    add_instruction_to_program(head->code, create_instruction(cbr, comparison_register, label_true, label_false, NULL, 3));
+
+    if(body != NULL && body->code->size != 0) { 
+        body->code->instructions[0].label = label_true; 
+        append_program(head->code, body->code);
+        add_instruction_to_program(head->code, create_instruction(jumpI, label_while, NULL, NULL, NULL, 1));
+    } else {
+        add_instruction_to_program(head->code, create_instruction(nop, NULL, NULL, NULL, label_true, 0));
+    }
+
+
+    add_instruction_to_program(head->code, create_instruction(nop, NULL, NULL, NULL, label_false, 0));
+}
+
 void print_instruction(instruction_t* instr) {
     if (!instr) return;
-    if (instr->label) printf("%s ", instr->label);
+    if (instr->label) printf("%s: ", instr->label);
     printf("%s ", OperationToString(instr->operation));
     switch (instr->operation) {
         case add:
@@ -163,15 +188,17 @@ void print_instruction(instruction_t* instr) {
             break;
         case cbr:
             if (instr->operand1) printf("%s, ", instr->operand1);
-            if (instr->operand2) printf("=> %s, ", instr->operand2);
+            if (instr->operand2) printf("-> %s, ", instr->operand2);
             if (instr->operand3) printf("%s", instr->operand3);
             break;
         case loadI:
             if (instr->operand1) printf("%s => ", instr->operand1);
             if (instr->operand1) printf("%s ", instr->operand2);
             break;
+        case jumpI:
+            if (instr->operand1) printf("-> %s ", instr->operand1);
         default:
-            printf("nop");
+            break;
     }
 
     printf("\n");
@@ -205,6 +232,7 @@ const char* OperationToString(iloc_operation_t op) {
         case loadI:   return "loadI";
         case label:   return "label";
         case nop:     return "nop";
-        default:      return "nop";
+        case jumpI:   return "jumpI";
+        default:      return "";
     }
 }
