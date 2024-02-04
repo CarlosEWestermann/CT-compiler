@@ -219,11 +219,10 @@ attrib: TK_IDENTIFICADOR '=' expr { $$ = asd_new("=");
                                     $$->type = var->type; 
                                     $$->offset = var->memory_offset;
                                     $$->is_global = var->is_global;
+                                    append_program($$->code, $3->code);
                                     char temp_offset[80];
-                                    char* temp_offset_register = generate_register();
                                     sprintf(temp_offset, "%i", $$->offset);
-                                    add_instruction_to_program($$->code, create_instruction(loadI, temp_offset, temp_offset_register, NULL, NULL, 2));
-                                    add_instruction_to_program($$->code, create_instruction(storeAI, $3->temp, temp_offset_register, $$->is_global ? "rbss" : "rfp", NULL, 3));
+                                    add_instruction_to_program($$->code, create_instruction(storeAI, $3->temp, $$->is_global ? "rbss" : "rfp", temp_offset, NULL, 3));
                                     free($1.token_value);
                                     };
 

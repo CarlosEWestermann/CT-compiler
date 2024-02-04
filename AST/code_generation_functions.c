@@ -172,7 +172,7 @@ void add_while(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *body) {
 
 void print_instruction(instruction_t* instr) {
     if (!instr) return;
-    if (instr->label) printf("%s: ", instr->label);
+    if (instr->label) printf("%s:\n", instr->label);
     printf("%s ", OperationToString(instr->operation));
     switch (instr->operation) {
         case add:
