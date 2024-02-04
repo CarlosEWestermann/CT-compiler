@@ -6,6 +6,8 @@
 #include "AST_functions.h"
 #define ARQUIVO_SAIDA "saida.dot"
 
+bool ENABLE_AST_PRINT = false;
+
 asd_tree_t *asd_new(const char *label)
 {
     asd_tree_t *ret = NULL;
@@ -51,10 +53,12 @@ void _exporta(asd_tree_t* node){
     if(node == NULL ){
         return;
     }
+    if(ENABLE_AST_PRINT)
     printf("%p [label=\"%s\"];\n", (void*)node, node->label);
 
     for(int i = 0; i < node->number_of_children; i++){
         if(node->children[i] != NULL ){
+            if(ENABLE_AST_PRINT)
             printf("%p, %p\n", (void*)node, (void*)node->children[i]);
             _exporta(node->children[i]);
         }
@@ -65,6 +69,7 @@ void exporta(void *arvore){
     asd_tree_t *root = (asd_tree_t*) arvore;
     if(root != NULL){
         _exporta(root);
+        print_program (root);
         asd_free(root);
     } 
 }
