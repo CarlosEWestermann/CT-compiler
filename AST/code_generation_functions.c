@@ -236,7 +236,7 @@ const char* operation_to_string(iloc_operation_t op) {
     switch (op) {
         case add:     return "add";
         case sub:     return "sub";
-        case mul:     return "mul";
+        case mul:     return "mult";
         case divi:    return "div";
         case ge:      return "cmp_GE";
         case gt:      return "cmp_GT";
