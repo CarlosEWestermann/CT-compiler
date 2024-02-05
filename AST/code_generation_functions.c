@@ -110,7 +110,7 @@ void add_if_else(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *if_body, 
     }
 
     if(else_body != NULL && else_body->code->size != 0) { 
-        else_body->code->instructions[0].label = label_true; 
+        else_body->code->instructions[0].label = label_false; 
         append_program(head->code, else_body->code);
     } else {
         add_instruction_to_program(head->code, create_instruction(nop, NULL, NULL, NULL, label_true, 0));
@@ -181,15 +181,15 @@ void print_instruction(instruction_t* instr) {
         case divi:
         case and:
         case or:
-        case ge:
-        case gt:
         case loadAI:
-        case le:
-        case lt:
             if (instr->operand1) printf("%s, ", instr->operand1);
             if (instr->operand2) printf("%s ", instr->operand2);
             if (instr->operand3) printf("=> %s", instr->operand3);
             break;
+        case ge:
+        case gt:
+        case le:
+        case lt:
         case cmp_ne:
         case cmp_eq:
             if (instr->operand1) printf("%s, ", instr->operand1);
@@ -238,10 +238,10 @@ const char* OperationToString(iloc_operation_t op) {
         case sub:     return "sub";
         case mul:     return "mul";
         case divi:    return "div";
-        case ge:      return "ge";
-        case gt:      return "gt";
-        case le:      return "le";
-        case lt:      return "lt";
+        case ge:      return "cmp_GE";
+        case gt:      return "cmp_GT";
+        case le:      return "cmp_LE";
+        case lt:      return "cmp_LT";
         case and:     return "and";
         case or:      return "or";
         case cmp_ne:  return "cmp_NE";
