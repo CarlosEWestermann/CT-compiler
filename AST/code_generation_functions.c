@@ -93,6 +93,7 @@ void add_if_else(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *if_body, 
     char* comparison_register = generate_register();
     char* label_true = generate_label();
     char* label_false = generate_label();
+    char* label_true_2 = generate_label();
 
     append_program(head->code, expression->code);
 
@@ -105,6 +106,7 @@ void add_if_else(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *if_body, 
     if(if_body != NULL && if_body->code->size != 0) { 
         if_body->code->instructions[0].label = label_true; 
         append_program(head->code, if_body->code);
+        add_instruction_to_program(head->code, create_instruction(jumpI, label_true_2, NULL, NULL, NULL, 1));
     } else {
         add_instruction_to_program(head->code, create_instruction(nop, NULL, NULL, NULL, label_true, 0));
     }
@@ -115,6 +117,9 @@ void add_if_else(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *if_body, 
     } else {
         add_instruction_to_program(head->code, create_instruction(nop, NULL, NULL, NULL, label_false, 0));
     }
+
+     add_instruction_to_program(head->code, create_instruction(nop, NULL, NULL, NULL, label_true_2, 0));
+
 }
 
 void add_binop(asd_tree_t *head, asd_tree_t *first_expression, asd_tree_t *second_expression, iloc_operation_t operation) {
