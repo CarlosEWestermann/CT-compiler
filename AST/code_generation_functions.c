@@ -113,7 +113,7 @@ void add_if_else(asd_tree_t *head, asd_tree_t *expression, asd_tree_t *if_body, 
         else_body->code->instructions[0].label = label_false; 
         append_program(head->code, else_body->code);
     } else {
-        add_instruction_to_program(head->code, create_instruction(nop, NULL, NULL, NULL, label_true, 0));
+        add_instruction_to_program(head->code, create_instruction(nop, NULL, NULL, NULL, label_false, 0));
     }
 }
 
