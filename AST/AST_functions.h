@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "code_generation_functions.h"
 #define ARQUIVO_SAIDA "saida.dot"
 
 typedef struct {
@@ -16,15 +17,6 @@ typedef struct {
         int token_type;
         char* token_value;
 } lexical_value_t;
-
-typedef struct asd_tree {
-    char *label;
-    int type;
-    char *value;
-    int number_of_children;
-    struct asd_tree **children;
-    struct asd_tree *next; 
-} asd_tree_t;
 
 asd_tree_t *asd_new(const char *label);
 void asd_free(asd_tree_t *tree);

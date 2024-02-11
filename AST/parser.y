@@ -73,7 +73,9 @@ init: /* empty */ { $$ = NULL; }
     | element init  {
                         if($1 != NULL) {
                             $$ = $1; 
-                            asd_add_child($$, $2); 
+                            asd_add_child($$, $2);
+                            if($2 != NULL)
+                                append_program($$->code, $2->code); 
                         } else {
                             $$ = $2;
                         } 
@@ -92,7 +94,7 @@ global_declaration: type list_vars ';' {
     $$ = $2; 
     int i = 0;
     while(varList[i] != NULL && i < 100){
-        insertSymbolWithScope(&stack, varList[i], lineList[i], IDENTIFIER, $1, "");
+        insertSymbolGlobal(&stack, varList[i], lineList[i], IDENTIFIER, $1, "");
         i++;
     }
     for(i = 0; i < 100; i++){
@@ -138,32 +140,44 @@ list_vars: TK_IDENTIFICADOR {   $$ = NULL;
                                             lineList[i] = $3.lineno;
                                             free($3.token_value); };
 
-function: push_scope header no_scope_body pop_scope { $$ = $2; asd_add_child($$, $3); };
+function: push_scope header no_scope_body pop_scope { $$ = $2; 
+                                                      asd_add_child($$, $3);
+                                                      if(strcmp($2->label, "main") == 0 && $3->code->size != 0){
+                                                        $3->code->instructions[0].label = strdup("L1");
+                                                        add_instruction_to_program($3->code, create_instruction(halt, NULL, NULL, NULL, NULL, 0));
+                                                        set_main();
+                                                      }
+                                                      append_program($$->code, $3->code); };
 
-header: '(' param_list ')' TK_OC_GE type '!' TK_IDENTIFICADOR { $$ = asd_new($7.token_value); insertSymbolGlobal(&stack, $7.token_value, $7.lineno, FUNCTION, $5, ""); /* $$->type = $5; */  free($7.token_value);}
-        | '(' ')' TK_OC_GE type '!' TK_IDENTIFICADOR { $$ = asd_new($6.token_value); insertSymbolGlobal(&stack, $6.token_value, $6.lineno, FUNCTION, $4, ""); /* $$->type = $4; */ free($6.token_value); };
+header: '(' param_list ')' TK_OC_GE type '!' TK_IDENTIFICADOR { $$ = asd_new($7.token_value); 
+                                                                insertSymbolGlobal(&stack, $7.token_value, $7.lineno, FUNCTION, $5, "");
+                                                                free($7.token_value);}
+        | '(' ')' TK_OC_GE type '!' TK_IDENTIFICADOR { $$ = asd_new($6.token_value); 
+                                                       insertSymbolGlobal(&stack, $6.token_value, $6.lineno, FUNCTION, $4, ""); 
+                                                       free($6.token_value); };
 
 param_list: param {  }
             | param_list ',' param {  };
 
-param: type TK_IDENTIFICADOR { insertSymbolWithScope(&stack, $2.token_value, $2.lineno, IDENTIFIER, $1, ""); free($2.token_value); }; 
+param: type TK_IDENTIFICADOR { insertSymbolWithScope(&stack, $2.token_value, $2.lineno, IDENTIFIER, $1, "");
+                               free($2.token_value); }; 
 
 no_scope_body: '{' '}' { $$ = NULL; }
     | '{'  command_list  '}' { $$ = $2; };
 
 command_list: command { $$ = $1; }
             | command command_list {if ($1 == NULL){
-                    $$ = $2;
-                }
-                else {
-                    $$ = $1;
-                    while ($$->next!=NULL) {
-                        $$ = $$->next;
-                    }
-                    asd_add_child($$, $2);
-                    $$->next=$2;
-                    $$ = $1;
-                };}
+                                        $$ = $2; }
+                                    else {
+                                        $$ = $1;
+                                        while ($$->next!=NULL) {
+                                            $$ = $$->next;
+                                        }
+                                        asd_add_child($$, $2);
+                                        append_program($$->code, $2->code);
+                                        $$->next=$2;
+                                        $$ = $1;
+                                    };}
 
 
 
@@ -194,15 +208,23 @@ local_var_dec: type list_vars {
         }
     } };
 
-attrib: TK_IDENTIFICADOR '=' expr { $$ = asd_new("="); asd_add_child($$, asd_new($1.token_value)); asd_add_child($$, $3); 
-    SymbolData *var = lookupSymbolWhenUsed(&stack, $1.token_value, $1.lineno, IDENTIFIER, $1.token_type, "");
-    if(var->nature == FUNCTION){
-            printf("Error: invalid expression! using %s of nature FUNCAO in line %d in left side of expression. Function originally declared in line %d\n", $1.token_value, $1.lineno, var->line);
-            exit(ERR_FUNCTION);
-        }
-    $$->type = var->type;
-    free($1.token_value);
-};
+attrib: TK_IDENTIFICADOR '=' expr { $$ = asd_new("="); 
+                                    asd_add_child($$, asd_new($1.token_value));
+                                    asd_add_child($$, $3); 
+                                    SymbolData *var = lookupSymbolWhenUsed(&stack, $1.token_value, $1.lineno, IDENTIFIER, $1.token_type, "");
+                                    if(var->nature == FUNCTION){
+                                            printf("Error: invalid expression! using %s of nature function in line %d in left side of expression. Function originally declared in line %d\n", $1.token_value, $1.lineno, var->line);
+                                            exit(ERR_FUNCTION);
+                                        }
+                                    $$->type = var->type; 
+                                    $$->offset = var->memory_offset;
+                                    $$->is_global = var->is_global;
+                                    append_program($$->code, $3->code);
+                                    char temp_offset[80];
+                                    sprintf(temp_offset, "%i", $$->offset);
+                                    add_instruction_to_program($$->code, create_instruction(storeAI, $3->temp, $$->is_global ? "rbss" : "rfp", temp_offset, NULL, 3));
+                                    free($1.token_value);
+                                    };
 
 function_call: TK_IDENTIFICADOR '(' arg_list ')' { 
                     char *buffer = malloc((strlen("call ") + strlen($1.token_value) + 1)* sizeof(char));
@@ -236,58 +258,170 @@ function_call: TK_IDENTIFICADOR '(' arg_list ')' {
 
 
 arg_list: arg { $$ = $1; }
-    | arg ',' arg_list { $$ = $1; asd_add_child($$, $3); };
+    | arg ',' arg_list { $$ = $1; asd_add_child($$, $3); append_program($$->code, $3->code); };
 
 arg: expr { $$ = $1; };
 
-return: TK_PR_RETURN expr { $$ = asd_new("return"); asd_add_child($$, $2); $$->type = $2->type; };
+return: TK_PR_RETURN expr { $$ = asd_new("return");
+                            asd_add_child($$, $2); 
+                            $$->type = $2->type; 
+                            //append_program($$->code, $2->code);
+                            };
 
-conditional: TK_PR_IF '(' expr ')' no_scope_body { $$ = asd_new("if"); asd_add_child($$, $3); asd_add_child($$, $5); $$->type = $3->type; }
-            | TK_PR_IF '(' expr ')' no_scope_body TK_PR_ELSE no_scope_body  { $$ = asd_new("if"); asd_add_child($$, $3); asd_add_child($$, $5); asd_add_child($$, $7); $$->type = $3->type; }
+conditional: TK_PR_IF '(' expr ')' no_scope_body { $$ = asd_new("if"); 
+                                                   asd_add_child($$, $3); 
+                                                   asd_add_child($$, $5); 
+                                                   $$->type = $3->type; 
+                                                   add_if($$, $3, $5); }
 
-while: TK_PR_WHILE '(' expr ')' no_scope_body { $$ = asd_new("while"); asd_add_child($$, $3); asd_add_child($$, $5); $$->type = $3->type;}
+            | TK_PR_IF '(' expr ')' no_scope_body TK_PR_ELSE no_scope_body  { $$ = asd_new("if"); 
+                                                                              asd_add_child($$, $3); 
+                                                                              asd_add_child($$, $5); 
+                                                                              asd_add_child($$, $7); 
+                                                                              $$->type = $3->type;
+                                                                              add_if_else($$, $3, $5, $7); }
+
+
+
+while: TK_PR_WHILE '(' expr ')' no_scope_body { $$ = asd_new("while"); 
+                                                asd_add_child($$, $3); 
+                                                asd_add_child($$, $5);
+                                                add_while($$, $3, $5);
+                                                $$->type = $3->type;}
 
 expr: logical_or_expr { $$ = $1; };
 
 logical_or_expr: logical_and_expr { $$ = $1; }
-    | logical_or_expr TK_OC_OR logical_and_expr {$$ = asd_new("|"); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);};
+    | logical_or_expr TK_OC_OR logical_and_expr {$$ = asd_new("|"); 
+                                                asd_add_child($$, $1); 
+                                                asd_add_child($$, $3); 
+                                                $$->type = inferType($1->type, $3->type);
+                                                add_binop($$, $1, $3, or); 
+                                                };
 
 logical_and_expr: equality_expr { $$ = $1; }
-    | logical_and_expr TK_OC_AND equality_expr { $$ = asd_new("&"); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);};
+    | logical_and_expr TK_OC_AND equality_expr { $$ = asd_new("&"); 
+                                                 asd_add_child($$, $1); 
+                                                 asd_add_child($$, $3); 
+                                                 $$->type = inferType($1->type, $3->type);
+                                                 add_binop($$, $1, $3, and); 
+                                                 };
 
 equality_expr: relational_expr { $$ = $1; }
-    | equality_expr TK_OC_EQ relational_expr { $$ = asd_new("=="); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);}
-    | equality_expr TK_OC_NE relational_expr { $$ = asd_new("!="); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);};
+    | equality_expr TK_OC_EQ relational_expr { $$ = asd_new("=="); 
+                                               asd_add_child($$, $1); 
+                                               asd_add_child($$, $3); 
+                                               $$->type = inferType($1->type, $3->type);
+                                               add_binop($$, $1, $3, cmp_eq); 
+                                               }
+
+    | equality_expr TK_OC_NE relational_expr { $$ = asd_new("!="); 
+                                               asd_add_child($$, $1); 
+                                               asd_add_child($$, $3); 
+                                               $$->type = inferType($1->type, $3->type);
+                                               add_binop($$, $1, $3, cmp_ne);
+                                               };
 
 relational_expr: add_sub_expr { $$ = $1; }
-    | relational_expr '<' add_sub_expr { $$ = asd_new("<"); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);}
-    | relational_expr '>' add_sub_expr { $$ = asd_new(">"); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);}
-    | relational_expr TK_OC_LE add_sub_expr { $$ = asd_new("<="); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);}
-    | relational_expr TK_OC_GE add_sub_expr { $$ = asd_new(">="); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);};
+    | relational_expr '<' add_sub_expr { $$ = asd_new("<"); 
+                                         asd_add_child($$, $1); 
+                                         asd_add_child($$, $3); 
+                                         $$->type = inferType($1->type, $3->type);
+                                         add_binop($$, $1, $3, lt);
+                                          }
+
+    | relational_expr '>' add_sub_expr { $$ = asd_new(">"); 
+                                         asd_add_child($$, $1); 
+                                         asd_add_child($$, $3); 
+                                         $$->type = inferType($1->type, $3->type);
+                                         add_binop($$, $1, $3, gt);
+                                         }
+
+    | relational_expr TK_OC_LE add_sub_expr { $$ = asd_new("<="); 
+                                              asd_add_child($$, $1); 
+                                              asd_add_child($$, $3); 
+                                              $$->type = inferType($1->type, $3->type);
+                                              add_binop($$, $1, $3, le);
+                                              }
+
+    | relational_expr TK_OC_GE add_sub_expr { $$ = asd_new(">="); 
+                                              asd_add_child($$, $1); 
+                                              asd_add_child($$, $3); 
+                                              $$->type = inferType($1->type, $3->type);
+                                              add_binop($$, $1, $3, ge);
+                                              };
 
 add_sub_expr: mult_div_mod_expr { $$ = $1; }
-    | add_sub_expr '+' mult_div_mod_expr { $$ = asd_new("+"); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);}
-    | add_sub_expr '-' mult_div_mod_expr { $$ = asd_new("-"); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);};
+    | add_sub_expr '+' mult_div_mod_expr { $$ = asd_new("+"); 
+                                           asd_add_child($$, $1); 
+                                           //append_program($$->code, $1->code);
+                                           asd_add_child($$, $3); 
+                                           //append_program($$->code, $3->code);
+                                           $$->type = inferType($1->type, $3->type);
+                                           add_binop($$, $1, $3, add);
+                                           }
+
+    | add_sub_expr '-' mult_div_mod_expr { $$ = asd_new("-"); 
+                                           asd_add_child($$, $1); 
+                                           asd_add_child($$, $3); 
+                                           $$->type = inferType($1->type, $3->type);
+                                           add_binop($$, $1, $3, sub);
+                                            };
 
 mult_div_mod_expr: unary_expr { $$ = $1; }
-    | mult_div_mod_expr '*' unary_expr { $$ = asd_new("*"); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);}
-    | mult_div_mod_expr '/' unary_expr { $$ = asd_new("/"); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);}
-    | mult_div_mod_expr '%' unary_expr { $$ = asd_new("%"); asd_add_child($$, $1); asd_add_child($$, $3); $$->type = inferType($1->type, $3->type);};
+    | mult_div_mod_expr '*' unary_expr { $$ = asd_new("*"); 
+                                         asd_add_child($$, $1); 
+                                         asd_add_child($$, $3); 
+                                         $$->type = inferType($1->type, $3->type);
+                                         add_binop($$, $1, $3, mul);
+                                         }
+
+    | mult_div_mod_expr '/' unary_expr { $$ = asd_new("/"); 
+                                         asd_add_child($$, $1); 
+                                         asd_add_child($$, $3); 
+                                         $$->type = inferType($1->type, $3->type);
+                                         add_binop($$, $1, $3, divi); 
+                                         }
+
+    | mult_div_mod_expr '%' unary_expr { $$ = asd_new("%"); 
+                                         asd_add_child($$, $1); 
+                                         asd_add_child($$, $3); 
+                                         $$->type = inferType($1->type, $3->type);};
 
 unary_expr: primary_expr { $$ = $1; }
-        | '-' unary_expr %prec UMINUS { $$ = asd_new("-"); asd_add_child($$, $2); $$->type = $2->type; }
-        | '!' unary_expr { $$ = asd_new("!"); asd_add_child($$, $2); $$->type = $2->type; };
+        | '-' unary_expr %prec UMINUS { $$ = asd_new("-"); 
+                                        asd_add_child($$, $2); 
+                                        $$->type = $2->type; }
 
-primary_expr: TK_IDENTIFICADOR { $$ = asd_new($1.token_value);     
+        | '!' unary_expr { $$ = asd_new("!"); 
+                           asd_add_child($$, $2); 
+                           $$->type = $2->type; };
+
+primary_expr: TK_IDENTIFICADOR { 
+        $$ = asd_new($1.token_value);     
         SymbolData *var = lookupSymbolWhenUsed(&stack, $1.token_value, $1.lineno, IDENTIFIER, $1.token_type, "");
         if(var->nature == FUNCTION){
             printf("Error: invalid expression! using %s of nature FUNCAO in line %d in left side of expression.. Function originally declared in line %d\n", $1.token_value, $1.lineno, var->line);
             exit(ERR_FUNCTION);
         }
         $$->type = var->type; 
+        $$->offset = var->memory_offset;
+        $$->is_global = var->is_global;
+        char* temp_register = generate_register();
+        char temp_offset[80];
+        sprintf(temp_offset, "%i", $$->offset);
+        add_instruction_to_program($$->code, create_instruction(loadAI, $$->is_global ? "rbss" : "rfp", temp_offset, temp_register, NULL, 3));
+        $$->temp = temp_register;
         free($1.token_value); 
         }
-    | TK_LIT_INT { $$ = asd_new($1.token_value); free($1.token_value); $$->type = INT; }
+    | TK_LIT_INT { $$ = asd_new($1.token_value);  $$->type = INT; 
+                    char* temp_register = generate_register();
+  
+    add_instruction_to_program($$->code, create_instruction(loadI, $1.token_value, temp_register, NULL, NULL, 2));
+    $$->temp = temp_register;
+    free($1.token_value);
+    //free(temp_register);
+    }
     | TK_LIT_FLOAT { $$ = asd_new($1.token_value); free($1.token_value); $$->type = FLOAT; }
     | TK_LIT_TRUE { $$ = asd_new($1.token_value); free($1.token_value); $$->type = BOOL; }
     | TK_LIT_FALSE { $$ = asd_new($1.token_value); free($1.token_value); $$->type = BOOL; }

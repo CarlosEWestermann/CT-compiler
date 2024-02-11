@@ -6,8 +6,9 @@
 #ifndef SYMBOL_TABLE_H
 #define SYMBOL_TABLE_H
 
-#define MAX_SCOPES 100 
+#include <stdbool.h>
 
+#define MAX_SCOPES 100 
 #define ERR_UNDECLARED 10 
 #define ERR_DECLARED 11 
 #define ERR_VARIABLE 20 
@@ -30,6 +31,8 @@ typedef struct {
     SymbolNature nature;
     SymbolType type;
     char value[50];
+    bool is_global;
+    int memory_offset;
 } SymbolData;
 
 typedef struct TableEntry {
@@ -48,7 +51,7 @@ typedef struct {
 } TableStack;
 
 void print_all(TableStack* stack);
-void insertSymbol(SymbolTable* table, const char* key, int line, SymbolNature nature, SymbolType type, const char* value);
+void insertSymbol(SymbolTable* table, const char* key, int line, SymbolNature nature, SymbolType type, const char* value, bool is_global);
 SymbolData* lookupSymbol(SymbolTable* table, const char* key);
 void freeTable(SymbolTable* table);
 void pushScope(TableStack* stack);
